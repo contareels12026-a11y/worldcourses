@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/platform.css">
+<script src="/i18n.js"></script><script src="/app.js"></script><title>Curso — The World Courses</title></head><body>
+<div id="chrome-top"></div>
+<main class="wrap page" id="course"><p class="muted">…</p></main>
+<div id="chrome-foot"></div>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+let C,player,cur=null,viewId=null,acc=0,lastT=null,hb;
+const id=+new URLSearchParams(location.search).get('id');
+async function load(){C=await api('/api/courses/'+id+'?lang='+LANG);document.title=C.title+' — The World Courses';
+ const m=document.getElementById('course');
+ m.innerHTML=`<a href="/#cursos" class="link">← ${t('back')}</a>
+ <div class="course-head"><div><span class="badge-inline ${C.is_free?'free':''}">${esc(C.badge)}</span><h1>${esc(C.title)}</h1><p class="lead2">${esc(C.description)}</p>
+ <p class="muted">${t('by')} <b>${esc(C.creator)}</b> · ${C.lessons.length} ${t('lessons')} · ${fmtDur(C.duration_sec)} · ★ ${C.rating}</p>
+ ${C.owned?`<p class="ok">✓ ${t('owned')}</p>`:''}${C.subscribed?`<p class="ok">✓ ALL ACCESS — ${t('sub_active')} ${(ME.subscription_until||'').slice(0,10)}</p>`:''}</div>
+ ${!C.is_free&&!C.owned&&!C.subscribed?`<div class="buybox"><b class="big">${eur(C.price)}</b><button class="btn gold block" data-buy="course">${t('buy_course')}</button><button class="btn outline block" data-buy="subscription">${t('subscribe')} · €39,99</button><p class="tiny">${t('test_mode')}</p></div>`:''}</div>
+ <div class="course-grid"><div><div class="player" id="playerBox"><div class="placeholder"><img src="/${esc(C.image)}" alt=""><p>${t('select_lesson')}</p></div></div><p class="tiny" id="trackNote"></p></div>
+ <aside class="lessons"><h3>${t('course_content')}</h3>${C.lessons.map(l=>`<button class="lesson ${l.unlocked?'':'lock'}" data-l="${l.id}"><span>${l.position}. ${esc(l.title)}</span><small>${fmtDur(l.duration_sec)} · ${l.free_preview?'<em class="pv">'+t('free_preview')+'</em>':l.unlocked?'▶':'🔒 '+t('locked')}</small></button>`).join('')}
+ <h4>${t('sources')}</h4><p class="tiny">${esc(C.source)}</p></aside></div>`;
+ m.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>play(+b.dataset.l));
+ m.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(b.dataset.buy));
+ const first=C.lessons.find(l=>!l.unlocked);const want=+new URLSearchParams(location.search).get('lesson');
+ if(want)play(want);else if(first&&new URLSearchParams(location.search).get('paywall'))play(first.id);
+}
+async function buy(kind,lesson_id){if(!ME){location.href='/login.html?next='+encodeURIComponent(location.pathname+location.search);return}
+ const amount=kind==='subscription'?39.99:kind==='lesson'?4.99:C.price;
+ if(!confirm(`${t('confirm_pay')} ${eur(amount)}?\n${t('test_mode')}`))return;
+ await api('/api/checkout',{method:'POST',body:{kind,course_id:C.id,lesson_id}});alert(t('paid_ok'));ME=await api('/api/me');await load();if(lesson_id)play(lesson_id)}
+async function play(lid){flush();document.querySelectorAll('.lesson').forEach(b=>b.classList.toggle('cur',+b.dataset.l===lid));
+ const box=document.getElementById('playerBox'),L=C.lessons.find(l=>l.id===lid);
+ try{const v=await api('/api/lessons/'+lid+'/play');cur={...v,id:lid};viewId=null;acc=0;lastT=null;
+  box.innerHTML='<div id="yt"></div>';
+  if(v.youtube_id){player=new YT.Player('yt',{videoId:v.youtube_id,playerVars:{start:v.start,rel:0,modestbranding:1},events:{onStateChange:onState}})}
+  else box.innerHTML=`<video controls src="${esc(v.video_url)}" id="vid"></video>`;
+  document.getElementById('trackNote').textContent=v.can_track?'':'—';
+  if(ME&&ME.role==='admin')document.getElementById('trackNote').innerHTML=`<button class="btn ghost sm" id="sim">${t('simulate')} (admin/demo)</button>`,document.getElementById('sim').onclick=async()=>{acc=cur.duration_sec;await flush(true);alert(t('tracking'))};
+ }catch(e){if(e.status!==402)throw e;const d=e.data;
+  box.innerHTML=`<div class="paywall"><img src="/${esc(C.image)}" alt=""><div><h2>🔒 ${t('paywall_t')}</h2><p>${esc(L.title)}</p><p class="muted">${t('paywall_p')}</p>
+  <div class="pw-btns"><button class="btn outline" data-k="lesson">${t('buy_lesson')} · ${eur(d.lesson_price)}</button><button class="btn gold" data-k="course">${t('buy_course')} · ${eur(d.course_price)}</button><button class="btn outline gold-b" data-k="subscription">${t('subscribe')} · ${eur(d.subscription)}</button></div>
+  ${ME?'':`<p class="tiny">${t('login_to_buy')}</p>`}<p class="tiny">${t('test_mode')}</p></div></div>`;
+  box.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>buy(b.dataset.k,b.dataset.k==='lesson'?lid:undefined))}}
+// tempo de visualização = tempo efetivamente reproduzido (não a posição), enviado a cada 10 s
+function onState(e){clearInterval(hb);if(e.data===1){lastT=Date.now();hb=setInterval(tick,10000)}else tick()}
+function tick(){if(lastT){acc+=(Date.now()-lastT)/1000;lastT=player&&player.getPlayerState&&player.getPlayerState()===1?Date.now():null}flush()}
+async function flush(force){if(!cur||!ME||(!acc&&!force))return;try{const r=await api('/api/views',{method:'POST',body:{lesson_id:cur.id,view_id:viewId,seconds:acc}});viewId=r.view_id;document.getElementById('trackNote').textContent=`${t('tracking')}: ${Math.round(Math.min(1,acc/cur.duration_sec)*100)}%`}catch{}}
+addEventListener('pagehide',()=>{if(cur&&ME&&acc)navigator.sendBeacon&&fetch('/api/views',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({lesson_id:cur.id,view_id:viewId,seconds:acc})})});
+READY.then(load);
+</script></body></html>

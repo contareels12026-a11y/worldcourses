@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/platform.css">
+<script src="/i18n.js"></script><script src="/app.js"></script><title>Painel de Criador — The World Courses</title></head><body>
+<div id="chrome-top"></div>
+<main class="wrap page" id="dash"></main><div id="chrome-foot"></div>
+<script>
+const CATS=['tech','mech','biz','ai','design','health','food','diy','travel','fitness'];
+async function load(month){const m=document.getElementById('dash');
+ if(!ME||!['creator','admin'].includes(ME.role)){m.innerHTML=`<p class="err">${t('not_allowed')}</p><a class="btn gold" href="/login.html?next=/creator.html">${t('login')}</a>`;return}
+ const s=await api('/api/creator/stats?lang='+LANG+(month?'&month='+month:'')),cs=await api('/api/creator/courses?lang='+LANG),k=s.mine;
+ m.innerHTML=`<div class="dash-head"><div><h1>${t('dashboard')}</h1><p class="muted">${esc(ME.name)}</p></div><label>${t('period')} <input type="month" id="month" value="${s.period.month}"></label></div>
+ <div class="kpis"><div><span>${t('views')}</span><b>${k.views}</b></div><div><span>${t('completions')}</span><b>${k.completions}</b></div><div><span>${t('partial')}</span><b>${k.partial}</b></div><div><span>${t('watch_min')}</span><b>${k.watch_minutes}</b></div><div class="gold-k"><span>${t('est_earn')}</span><b>${eur(k.earnings)}</b></div></div>
+ <div class="panel"><p>${t('pool_info')}: <b>${eur(s.pool)}</b> · ${t('weight')}: <b>${k.weight}</b> / ${s.total_weight} · ${t('share')}: <b>${(k.share*100).toFixed(2)}%</b> · ${t('ignored')}: ${k.ignored}</p><p class="tiny">${t('payout_note')}</p>
+ <p class="formula">${t('est_earn')} = ${t('pool')} × (Σ ${t('weight')} / Σ ${t('weight')} total) · ${t('pool')} = ${t('gross')} × (1 − ${Math.round(s.settings.platform_share*100)}%)</p></div>
+ <h2>${t('my_courses')}</h2><table class="tbl"><tr><th>${t('course')}</th><th>${t('list_price')}</th><th>${t('views')}</th><th>${t('completions')}</th><th>${t('watch_min')}</th></tr>
+ ${s.perCourse.map(c=>{const x=cs.find(y=>y.id===c.id)||{};return`<tr><td><a href="/course.html?id=${c.id}">${esc(c.title)}</a></td><td>${x.is_free?t('free'):eur(x.price)}</td><td>${c.views}</td><td>${c.completions}</td><td>${c.minutes}</td></tr>`}).join('')}</table>
+ <h2>${t('new_course')}</h2><form id="nc" class="panel form-grid">
+ <label>${t('title')}<input name="title" required></label><label>${t('subtitle')}<input name="subtitle"></label>
+ <label class="full">${t('description')}<textarea name="description" rows="3"></textarea></label>
+ <label>${t('category')}<select name="category">${CATS.map(c=>`<option value="${c}">${t('c_'+c).replace('<br>',' ')}</option>`).join('')}</select></label>
+ <label>${t('list_price')}<select name="price"><option value="free">${t('free')}</option><option value="4.99">€4,99</option><option value="12.99" selected>€12,99</option></select></label>
+ <div class="full" id="ls"></div><button type="button" class="btn ghost sm" id="addL">+ ${t('add_lesson')}</button>
+ <button class="btn gold">${t('publish')}</button><p class="tiny full">${t('payout_note')}</p></form>`;
+ document.getElementById('month').onchange=e=>load(e.target.value);
+ const ls=document.getElementById('ls'),add=()=>{ls.insertAdjacentHTML('beforeend',`<div class="lrow"><input placeholder="${t('title')}" data-f="title" required><input placeholder="${t('video_link')}" data-f="video" required><input type="number" min="1" value="10" data-f="minutes" title="${t('minutes')}"><label class="chk"><input type="checkbox" data-f="free_preview"> ${t('preview_q')}</label></div>`)};add();
+ document.getElementById('addL').onclick=add;
+ document.getElementById('nc').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));
+  f.lessons=[...ls.querySelectorAll('.lrow')].map(r=>({title:r.querySelector('[data-f=title]').value,video:r.querySelector('[data-f=video]').value,minutes:r.querySelector('[data-f=minutes]').value,free_preview:r.querySelector('[data-f=free_preview]').checked}));
+  const r=await api('/api/creator/courses',{method:'POST',body:f});alert(t('published_ok'));location.href='/course.html?id='+r.id}}
+READY.then(()=>load());
+</script></body></html>

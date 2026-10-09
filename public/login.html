@@ -1,0 +1,24 @@
+<!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/platform.css">
+<script src="/i18n.js"></script><script src="/app.js"></script><title>Entrar — The World Courses</title></head><body>
+<div id="chrome-top"></div>
+<main class="wrap page auth-page"><div class="auth-card">
+ <div class="seg"><button id="mLogin" data-i18n="login"></button><button id="mSignup" data-i18n="signup"></button></div>
+ <h1 id="aTitle"></h1>
+ <form id="aForm"><label class="su"><span data-i18n="name"></span><input name="name" autocomplete="name"></label>
+ <label><span>Email</span><input name="email" type="email" required autocomplete="email"></label>
+ <label><span data-i18n="password"></span><input name="password" type="password" required minlength="6" autocomplete="current-password"></label>
+ <fieldset class="su roles"><legend data-i18n="i_am"></legend><label><input type="radio" name="role" value="user" checked> <span data-i18n="role_user"></span></label><label><input type="radio" name="role" value="creator"> <span data-i18n="role_creator"></span></label></fieldset>
+ <p class="err" id="aErr"></p><button class="btn gold block" id="aBtn"></button></form>
+ <details class="demo"><summary data-i18n="demo_accounts"></summary><p class="tiny">admin@worldcourses.test / Admin123!<br>mariana@worldcourses.test / Criador123!<br>ricardo@worldcourses.test / Criador123!<br>aluno@worldcourses.test / Aluno123!</p></details>
+</div></main><div id="chrome-foot"></div>
+<script>
+const P=new URLSearchParams(location.search);let mode=P.get('mode')==='signup'?'signup':'login';
+function setMode(m){mode=m;document.querySelectorAll('.su').forEach(e=>e.style.display=m==='signup'?'':'none');document.getElementById('aTitle').textContent=t(m==='signup'?'create_acc':'welcome_back');document.getElementById('aBtn').textContent=t(m==='signup'?'signup':'login');document.getElementById('mLogin').classList.toggle('on',m==='login');document.getElementById('mSignup').classList.toggle('on',m==='signup')}
+READY.then(()=>{if(P.get('role')==='creator')document.querySelector('[value=creator]').checked=true;setMode(mode);
+ document.getElementById('mLogin').onclick=()=>setMode('login');document.getElementById('mSignup').onclick=()=>setMode('signup');
+ document.getElementById('aForm').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));
+  try{const u=await api('/api/'+mode,{method:'POST',body:f});location.href=P.get('next')||(u.role==='creator'?'/creator.html':u.role==='admin'?'/admin.html':'/')}
+  catch(x){document.getElementById('aErr').textContent=t('err_'+(x.message==='exists'?'exists':x.message==='credentials'?'credentials':'invalid'))}}});
+</script></body></html>
