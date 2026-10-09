@@ -1,4 +1,4 @@
-const CATS=[['tech','🖥️'],['mech','🚗'],['biz','📈'],['ai','🤖'],['design','🎨'],['health','💓'],['food','👨‍🍳'],['diy','🏠'],['travel','✈️'],['fitness','🏋️'],['more','⋯']];
+const CATS=[['tech','🖥️'],['mech','🚗'],['biz','📈'],['ai','🤖'],['design','🎨'],['health','💓'],['food','👨‍🍳'],['diy','🏠'],['travel','✈️'],['fitness','🏋️'],['influencer','🤳'],['more','⋯']];
 let COURSES=[],TAB='all',CAT=new URLSearchParams(location.search).get('cat')||'',Q=(new URLSearchParams(location.search).get('q')||'').toLowerCase();
 const car=document.getElementById('carousel');
 function render(){let list=[...COURSES];

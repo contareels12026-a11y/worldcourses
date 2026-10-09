@@ -5,7 +5,7 @@
 <div id="chrome-top"></div>
 <main class="wrap page" id="dash"></main><div id="chrome-foot"></div>
 <script>
-const CATS=['tech','mech','biz','ai','design','health','food','diy','travel','fitness'];
+const CATS=['tech','mech','biz','ai','design','health','food','diy','travel','fitness','influencer'];
 async function load(month){const m=document.getElementById('dash');
  if(!ME||!['creator','admin'].includes(ME.role)){m.innerHTML=`<p class="err">${t('not_allowed')}</p><a class="btn gold" href="/login.html?next=/creator.html">${t('login')}</a>`;return}
  const s=await api('/api/creator/stats?lang='+LANG+(month?'&month='+month:'')),cs=await api('/api/creator/courses?lang='+LANG),k=s.mine;

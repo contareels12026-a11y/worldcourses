@@ -49,7 +49,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}button{font:inherit;cursor:p
 .sec{padding:34px 32px 10px}
 .sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;gap:16px;flex-wrap:wrap}
 .sec-head h2{font-size:26px;font-weight:800}.sec-head p{color:var(--mut)}.link{color:var(--gold);font-weight:600}
-.cats{display:grid;grid-template-columns:repeat(11,1fr);gap:10px}
+.cats{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
 .cats a{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 6px;text-align:center;font-size:12px;font-weight:500;transition:.2s}
 .cats a:hover{border-color:var(--gold);transform:translateY(-3px)}
 .cats i{display:block;font-size:30px;margin-bottom:10px;filter:saturate(1.3)}

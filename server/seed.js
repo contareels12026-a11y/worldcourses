@@ -47,7 +47,12 @@ const courses=[
   L:[[['Inspiração: Costa Rica em 4K','Inspiration: Costa Rica in 4K','Inspiration : le Costa Rica en 4K'],'LXb3EKWsInQ',0,600,1],[['Cor e luz cinematográfica','Cinematic colour & light','Couleur et lumière cinématographiques'],'R6MlUcmOul8',0,730,0],[['Contar histórias com imagens','Storytelling with images','Raconter des histoires en images'],'eRsGyueVLvQ',0,890,0]]},
 ];
 const ids=[];
-for(const c of courses){const id=db.run('INSERT INTO courses(creator_id,category,i18n,image,price,is_free,badge,source) VALUES(?,?,?,?,?,?,?,?)',[c.cr,c.cat,c.t,'assets/'+c.img,c.price,c.free?1:0,c.free?'FREE':c.badge,c.src]);
+const EXTRA=require('./extra_courses.json');
+for(const e of EXTRA){const cr=['tech','ai','biz','mech'].includes(e.cat)?mariana:ricardo;
+  courses.push({cr,cat:e.cat,price:e.price,free:e.price===0?1:0,badge:e.badge,yt:e.lessons[0].id,
+    src:SRC([...new Set(e.lessons.map(l=>l.author))].join(' · ')),t:C([e.t[0],e.st[0],e.d[0]],[e.t[1],e.st[1],e.d[1]],[e.t[2],e.st[2],e.d[2]]),
+    L:e.lessons.map((l,i)=>[l.titles,l.id,0,l.sec,i===0?1:0])})}
+for(const c of courses){c.img='yt/'+(c.yt||c.L.find(l=>l[4])[1])+'.jpg';const id=db.run('INSERT INTO courses(creator_id,category,i18n,image,price,is_free,badge,source) VALUES(?,?,?,?,?,?,?,?)',[c.cr,c.cat,c.t,'assets/'+c.img,c.price,c.free?1:0,c.free?'FREE':c.badge,c.src]);
   c.L.forEach((l,i)=>db.run('INSERT INTO lessons(course_id,position,i18n,youtube_id,start_sec,duration_sec,free_preview) VALUES(?,?,?,?,?,?,?)',[id,i+1,T(...l[0]),l[1],l[2],l[3],l[4]]));ids.push(id)}
 // ---- simulação: alunos, pagamentos e visualizações no mês corrente
 let seed=42;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
@@ -61,7 +66,7 @@ learners.forEach((u,i)=>{const w=day();
   else if((i+1)%3===1){const c=courses[[1,2,4,6,10][i%5]];const cid=ids[courses.indexOf(c)];pay(u,'course',c.price,cid,null,w,null)}
   else{const l=db.get('SELECT id,course_id FROM lessons WHERE free_preview=0 ORDER BY id LIMIT 1 OFFSET ?',[i%12]);pay(u,'lesson',4.99,l.course_id,l.id,w,null)}});
 const lessons=db.all('SELECT l.id,l.course_id,l.duration_sec,c.creator_id FROM lessons l JOIN courses c ON c.id=l.course_id');
-for(let k=0;k<420;k++){const u=learners[Math.floor(rnd()*learners.length)],l=lessons[Math.floor(rnd()*lessons.length)];
+for(let k=0;k<1100;k++){const u=learners[Math.floor(rnd()*learners.length)],l=lessons[Math.floor(rnd()*lessons.length)];
   const r=rnd(),pct=r<0.45?0.92+rnd()*0.08:r<0.85?0.1+rnd()*0.8:rnd()*0.1;
   db.run('INSERT INTO views(user_id,lesson_id,course_id,creator_id,seconds,pct,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)',[u,l.id,l.course_id,l.creator_id,Math.round(pct*l.duration_sec),Math.min(1,pct),day(),day()])}
 db.saveNow();console.log('Seed concluído:',courses.length,'cursos,',lessons.length,'aulas,',learners.length,'alunos.');

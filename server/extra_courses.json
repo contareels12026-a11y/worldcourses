@@ -1,0 +1,1432 @@
+[
+ {
+  "cat": "influencer",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "Cresce o teu Website e Página",
+   "Grow Your Website & Page",
+   "Fais grandir ton site et ta page"
+  ],
+  "st": [
+   "SEO e tráfego para iniciantes",
+   "SEO and traffic for beginners",
+   "SEO et trafic pour débutants"
+  ],
+  "d": [
+   "Aprende o essencial de SEO e estratégias para levar visitantes ao teu site ou página.",
+   "Learn SEO essentials and strategies to bring visitors to your website or page.",
+   "Apprends les bases du SEO et des stratégies pour attirer des visiteurs sur ton site ou ta page."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "SEO para iniciantes",
+     "SEO for beginners",
+     "SEO pour débutants"
+    ],
+    "id": "xsVTqzratPs",
+    "yt_title": "Complete SEO Course for Beginners: Learn to Rank #1 in Google",
+    "author": "Ahrefs",
+    "sec": 7023
+   },
+   {
+    "titles": [
+     "Aumentar o tráfego do site",
+     "Increase website traffic",
+     "Augmenter le trafic du site"
+    ],
+    "id": "PrbhGigQpkI",
+    "yt_title": "Every Way To Get Traffic To Your Website In 2026",
+    "author": "LYFE Marketing",
+    "sec": 649
+   },
+   {
+    "titles": [
+     "Criar uma landing page que converte",
+     "Build a landing page that converts",
+     "Créer une landing page qui convertit"
+    ],
+    "id": "hcPxMuxh5Tc",
+    "yt_title": "The Anatomy Of A High Converting Landing Page | Conversion Rate Optimization Tips",
+    "author": "Neil Patel",
+    "sec": 395
+   }
+  ]
+ },
+ {
+  "cat": "influencer",
+  "price": 12.99,
+  "badge": "PREMIUM",
+  "t": [
+   "Seguidores no Instagram e TikTok",
+   "Followers on Instagram & TikTok",
+   "Abonnés sur Instagram et TikTok"
+  ],
+  "st": [
+   "Estratégias de crescimento orgânico",
+   "Organic growth strategies",
+   "Stratégies de croissance organique"
+  ],
+  "d": [
+   "Como funcionam os algoritmos, que conteúdo publicar e como ganhar os primeiros milhares de seguidores.",
+   "How algorithms work, what to post and how to win your first thousands of followers.",
+   "Comment fonctionnent les algorithmes, quoi publier et comment gagner tes premiers milliers d’abonnés."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Crescer no Instagram do zero",
+     "Grow on Instagram from zero",
+     "Grandir sur Instagram à partir de zéro"
+    ],
+    "id": "HURkewhFaso",
+    "yt_title": "How to grow an Instagram account from SCRATCH (With ZERO Followers!)",
+    "author": "Steven Wommack",
+    "sec": 265
+   },
+   {
+    "titles": [
+     "Crescer no TikTok",
+     "Grow on TikTok",
+     "Grandir sur TikTok"
+    ],
+    "id": "MBxjPb8hRws",
+    "yt_title": "Your 30 day plan to blow up on TikTok in 2026",
+    "author": "Mike Yanda",
+    "sec": 1535
+   },
+   {
+    "titles": [
+     "Reels que geram alcance",
+     "Reels that drive reach",
+     "Des Reels qui génèrent de la portée"
+    ],
+    "id": "odPz5WfH19I",
+    "yt_title": "Copy This Instagram Strategy to Grow FAST in 2026",
+    "author": "heyDominik",
+    "sec": 616
+   }
+  ]
+ },
+ {
+  "cat": "influencer",
+  "price": 12.99,
+  "badge": "PREMIUM",
+  "t": [
+   "Crescimento de Canal no YouTube",
+   "YouTube Channel Growth",
+   "Croissance de chaîne YouTube"
+  ],
+  "st": [
+   "Do primeiro vídeo aos 1000 subscritores",
+   "From first video to 1,000 subscribers",
+   "Du premier vidéo aux 1000 abonnés"
+  ],
+  "d": [
+   "Planeamento, títulos, miniaturas e o algoritmo do YouTube explicados.",
+   "Planning, titles, thumbnails and the YouTube algorithm explained.",
+   "Planification, titres, miniatures et l’algorithme YouTube expliqués."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Como começar um canal",
+     "How to start a channel",
+     "Comment lancer une chaîne"
+    ],
+    "id": "mvs1zdReXGI",
+    "yt_title": "How to Create a YouTube Channel for Beginners (Step-By-Step)",
+    "author": "Ben Claremont",
+    "sec": 527
+   },
+   {
+    "titles": [
+     "Títulos e miniaturas",
+     "Titles & thumbnails",
+     "Titres et miniatures"
+    ],
+    "id": "9j3OgjfA0iU",
+    "yt_title": "2025 Guide to Making YouTube Thumbnails - 15 Top Questions Answered",
+    "author": "vidIQ",
+    "sec": 1288
+   },
+   {
+    "titles": [
+     "Chegar aos 1000 subscritores",
+     "Getting to 1,000 subscribers",
+     "Atteindre 1000 abonnés"
+    ],
+    "id": "MNDeTg4IFGQ",
+    "yt_title": "How to Get Your First 1,000 Subscribers on YouTube (Step-by-Step)",
+    "author": "Think Media",
+    "sec": 1625
+   }
+  ]
+ },
+ {
+  "cat": "influencer",
+  "price": 4.99,
+  "badge": "ESSENTIAL",
+  "t": [
+   "Marca Pessoal e Criação de Conteúdo",
+   "Personal Branding & Content Creation",
+   "Marque personnelle et création de contenu"
+  ],
+  "st": [
+   "Encontra a tua voz e o teu nicho",
+   "Find your voice and niche",
+   "Trouve ta voix et ta niche"
+  ],
+  "d": [
+   "Define o teu nicho, constrói uma marca pessoal e cria conteúdo consistente.",
+   "Define your niche, build a personal brand and create consistent content.",
+   "Définis ta niche, construis une marque personnelle et crée du contenu régulier."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "O que é marca pessoal",
+     "What is personal branding",
+     "Qu’est-ce que la marque personnelle"
+    ],
+    "id": "ozMCb0wOnMU",
+    "yt_title": "5 Steps to Building a Personal Brand You Feel Good About | The Way We Work, a TED series",
+    "author": "TED",
+    "sec": 375
+   },
+   {
+    "titles": [
+     "Escolher o teu nicho",
+     "Choosing your niche",
+     "Choisir ta niche"
+    ],
+    "id": "TLCuJRivmhU",
+    "yt_title": "How to ACTUALLY Pick A Niche (for Creators who WANT to niche down)",
+    "author": "Modern Millie",
+    "sec": 723
+   },
+   {
+    "titles": [
+     "Sistema de criação de conteúdo",
+     "Content creation system",
+     "Système de création de contenu"
+    ],
+    "id": "A8PxRHQrLJ8",
+    "yt_title": "How I'd Create Content in 2026 (If I Had To Start Over)",
+    "author": "Ali Abdaal",
+    "sec": 956
+   }
+  ]
+ },
+ {
+  "cat": "influencer",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "Monetização para Criadores",
+   "Monetization Basics for Creators",
+   "Bases de la monétisation"
+  ],
+  "st": [
+   "Transforma audiência em rendimento",
+   "Turn audience into income",
+   "Transforme ton audience en revenus"
+  ],
+  "d": [
+   "Parcerias com marcas, afiliados, produtos digitais e anúncios: as bases para monetizar.",
+   "Brand deals, affiliates, digital products and ads: the basics of monetizing.",
+   "Partenariats, affiliation, produits numériques et publicités : les bases pour monétiser."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Formas de monetizar",
+     "Ways to monetize",
+     "Façons de monétiser"
+    ],
+    "id": "Qp4x7HCd8Jw",
+    "yt_title": "How do Content Creators Make Money? || Income Streams Explained",
+    "author": "Creating with Kaya",
+    "sec": 649
+   },
+   {
+    "titles": [
+     "Parcerias com marcas",
+     "Brand deals",
+     "Partenariats avec les marques"
+    ],
+    "id": "TKDWEXIgQYk",
+    "yt_title": "You're gonna get brand deals in 2026. here's how.",
+    "author": "Katie Steckly",
+    "sec": 938
+   },
+   {
+    "titles": [
+     "Marketing de afiliados",
+     "Affiliate marketing",
+     "Marketing d’affiliation"
+    ],
+    "id": "mOWXI6VKGpg",
+    "yt_title": "How To Start Affiliate Marketing For Beginners",
+    "author": "John Crestani",
+    "sec": 765
+   }
+  ]
+ },
+ {
+  "cat": "mech",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "Manutenção Automóvel Básica",
+   "Basic Car Maintenance",
+   "Entretien automobile de base"
+  ],
+  "st": [
+   "Cuida do teu carro",
+   "Take care of your car",
+   "Prends soin de ta voiture"
+  ],
+  "d": [
+   "Verificações essenciais, óleo, pneus e manutenção preventiva.",
+   "Essential checks, oil, tyres and preventive maintenance.",
+   "Vérifications essentielles, huile, pneus et entretien préventif."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Guia de manutenção",
+     "Maintenance guide",
+     "Guide d’entretien"
+    ],
+    "id": "25-HG471MIc",
+    "yt_title": "A Mechanics Guide To Maintaining Your Car",
+    "author": "EricTheCarGuy",
+    "sec": 450
+   },
+   {
+    "titles": [
+     "Mudar o óleo",
+     "Changing the oil",
+     "Faire la vidange"
+    ],
+    "id": "O1hF25Cowv8",
+    "yt_title": "How to Change Your Oil (COMPLETE Guide)",
+    "author": "ChrisFix",
+    "sec": 1229
+   },
+   {
+    "titles": [
+     "Pneus e pressão",
+     "Tyres & pressure",
+     "Pneus et pression"
+    ],
+    "id": "0Q-Eb7aUyt4",
+    "yt_title": "How to Properly Check and Fill Tires on Your Car",
+    "author": "1A Auto: Repair Tips & Secrets Only Mechanics Know",
+    "sec": 287
+   }
+  ]
+ },
+ {
+  "cat": "mech",
+  "price": 12.99,
+  "badge": "PREMIUM",
+  "t": [
+   "Como Funciona um Motor",
+   "How an Engine Works",
+   "Comment fonctionne un moteur"
+  ],
+  "st": [
+   "Mecânica explicada",
+   "Mechanics explained",
+   "La mécanique expliquée"
+  ],
+  "d": [
+   "Motor de combustão, transmissão e embraiagem explicados com animações.",
+   "Combustion engine, transmission and clutch explained with animations.",
+   "Moteur à combustion, transmission et embrayage expliqués en animations."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "O motor de combustão",
+     "The combustion engine",
+     "Le moteur à combustion"
+    ],
+    "id": "ZQvfHyfgBtA",
+    "yt_title": "How a Car Engine Works",
+    "author": "Animagraffs",
+    "sec": 475
+   },
+   {
+    "titles": [
+     "A embraiagem",
+     "The clutch",
+     "L’embrayage"
+    ],
+    "id": "6DL0j0eKD8Y",
+    "yt_title": "How a clutch works. (3D Animation).",
+    "author": "No User Serviceable Parts",
+    "sec": 164
+   },
+   {
+    "titles": [
+     "A caixa de velocidades",
+     "The gearbox",
+     "La boîte de vitesses"
+    ],
+    "id": "o1ED4FQjDGk",
+    "yt_title": "How a Manual Transmission and Clutch Works",
+    "author": "Animagraffs",
+    "sec": 623
+   }
+  ]
+ },
+ {
+  "cat": "mech",
+  "price": 4.99,
+  "badge": "ESSENTIAL",
+  "t": [
+   "Diagnóstico e Reparações Simples",
+   "Diagnostics & Simple Repairs",
+   "Diagnostic et réparations simples"
+  ],
+  "st": [
+   "Poupa na oficina",
+   "Save at the garage",
+   "Économise au garage"
+  ],
+  "d": [
+   "Usa um leitor OBD2, troca pastilhas de travão e resolve problemas comuns.",
+   "Use an OBD2 scanner, replace brake pads and solve common problems.",
+   "Utilise un lecteur OBD2, change les plaquettes et résous les problèmes courants."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Usar um leitor OBD2",
+     "Using an OBD2 scanner",
+     "Utiliser un lecteur OBD2"
+    ],
+    "id": "YGG9VLzeMk8",
+    "yt_title": "How to Use an OBD2 Scan Tool",
+    "author": "EasyAutoFix",
+    "sec": 172
+   },
+   {
+    "titles": [
+     "Trocar pastilhas de travão",
+     "Replacing brake pads",
+     "Changer les plaquettes de frein"
+    ],
+    "id": "6RQ9UabOIPg",
+    "yt_title": "How to Replace Brake Pads and Rotors (COMPLETE Guide)",
+    "author": "ChrisFix",
+    "sec": 861
+   },
+   {
+    "titles": [
+     "Bateria e arranque",
+     "Battery & starting",
+     "Batterie et démarrage"
+    ],
+    "id": "weBp61J4obg",
+    "yt_title": "How to Test a Car Battery with a Multimeter",
+    "author": "Steve's Garage",
+    "sec": 178
+   }
+  ]
+ },
+ {
+  "cat": "biz",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "Finanças Pessoais",
+   "Personal Finance",
+   "Finances personnelles"
+  ],
+  "st": [
+   "Orçamento, poupança e investimento",
+   "Budget, savings and investing",
+   "Budget, épargne et investissement"
+  ],
+  "d": [
+   "Organiza o teu dinheiro, cria um orçamento e começa a investir.",
+   "Organise your money, build a budget and start investing.",
+   "Organise ton argent, crée un budget et commence à investir."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Criar um orçamento",
+     "Making a budget",
+     "Faire un budget"
+    ],
+    "id": "3pslPbfpnzk",
+    "yt_title": "HOW TO: THE EASIEST AND SIMPLEST WAY TO CREATE A MONTHLY BUDGET! 6-MINUTES PROCESS",
+    "author": "Shay Budgets",
+    "sec": 385
+   },
+   {
+    "titles": [
+     "Fundo de emergência",
+     "Emergency fund",
+     "Fonds d’urgence"
+    ],
+    "id": "tVGJqaOkqac",
+    "yt_title": "Emergency Funds 101: You’re Screwed If You Don’t Have One",
+    "author": "George Kamel",
+    "sec": 616
+   },
+   {
+    "titles": [
+     "Investir para iniciantes",
+     "Investing for beginners",
+     "Investir pour débutants"
+    ],
+    "id": "mrKKW3riVIA",
+    "yt_title": "Index Funds for Beginners: A Step-by-Step Guide to Passive Investing",
+    "author": "Austin Williams",
+    "sec": 865
+   }
+  ]
+ },
+ {
+  "cat": "biz",
+  "price": 12.99,
+  "badge": "PREMIUM",
+  "t": [
+   "Criar o teu Negócio",
+   "Start Your Business",
+   "Lancer ton entreprise"
+  ],
+  "st": [
+   "Da ideia ao primeiro cliente",
+   "From idea to first customer",
+   "De l’idée au premier client"
+  ],
+  "d": [
+   "Validação de ideias, plano de negócio e primeiras vendas.",
+   "Idea validation, business plan and first sales.",
+   "Validation d’idées, business plan et premières ventes."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Validar uma ideia",
+     "Validating an idea",
+     "Valider une idée"
+    ],
+    "id": "Th8JoIan4dg",
+    "yt_title": "How to Get and Evaluate Startup Ideas | Startup School",
+    "author": "Y Combinator",
+    "sec": 1942
+   },
+   {
+    "titles": [
+     "O business model canvas",
+     "The business model canvas",
+     "Le business model canvas"
+    ],
+    "id": "QoAOzMTLP5s",
+    "yt_title": "Business Model Canvas Explained",
+    "author": "Strategyzer",
+    "sec": 140
+   },
+   {
+    "titles": [
+     "Conseguir os primeiros clientes",
+     "Getting first customers",
+     "Obtenir les premiers clients"
+    ],
+    "id": "hyYCn_kAngI",
+    "yt_title": "How to Get Your First Customers | Startup School",
+    "author": "Y Combinator",
+    "sec": 1374
+   }
+  ]
+ },
+ {
+  "cat": "biz",
+  "price": 4.99,
+  "badge": "ESSENTIAL",
+  "t": [
+   "Contabilidade e Economia Básica",
+   "Accounting & Economics Basics",
+   "Comptabilité et économie de base"
+  ],
+  "st": [
+   "Entende os números",
+   "Understand the numbers",
+   "Comprends les chiffres"
+  ],
+  "d": [
+   "Balanço, demonstração de resultados e como funciona a economia.",
+   "Balance sheet, income statement and how the economy works.",
+   "Bilan, compte de résultat et fonctionnement de l’économie."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Como funciona a economia",
+     "How the economy works",
+     "Comment fonctionne l’économie"
+    ],
+    "id": "PHe0bXAIuk0",
+    "yt_title": "How The Economic Machine Works by Ray Dalio",
+    "author": "Principles by Ray Dalio",
+    "sec": 1860
+   },
+   {
+    "titles": [
+     "Ler um balanço",
+     "Reading a balance sheet",
+     "Lire un bilan"
+    ],
+    "id": "CMv1zlZhb4Q",
+    "yt_title": "The BALANCE SHEET for BEGINNERS (Full Example)",
+    "author": "Accounting Stuff",
+    "sec": 419
+   },
+   {
+    "titles": [
+     "Demonstração de resultados",
+     "Income statement",
+     "Compte de résultat"
+    ],
+    "id": "hrSUq4wcd0g",
+    "yt_title": "The INCOME STATEMENT Explained (Profit & Loss / P&L)",
+    "author": "Accounting Stuff",
+    "sec": 686
+   }
+  ]
+ },
+ {
+  "cat": "health",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "Sono e Bem-estar",
+   "Sleep & Wellbeing",
+   "Sommeil et bien-être"
+  ],
+  "st": [
+   "Dorme melhor, vive melhor",
+   "Sleep better, live better",
+   "Dors mieux, vis mieux"
+  ],
+  "d": [
+   "A ciência do sono e hábitos práticos para descansar melhor.",
+   "The science of sleep and practical habits for better rest.",
+   "La science du sommeil et des habitudes pratiques pour mieux se reposer."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Porque dormimos",
+     "Why we sleep",
+     "Pourquoi nous dormons"
+    ],
+    "id": "5MuIMqhT8DM",
+    "yt_title": "Sleep Is Your Superpower | Matt Walker | TED",
+    "author": "TED",
+    "sec": 1159
+   },
+   {
+    "titles": [
+     "Hábitos para dormir melhor",
+     "Habits for better sleep",
+     "Habitudes pour mieux dormir"
+    ],
+    "id": "t0kACis_dJE",
+    "yt_title": "6 tips for better sleep | Sleeping with Science, a TED series",
+    "author": "TED",
+    "sec": 329
+   },
+   {
+    "titles": [
+     "Gerir o stress",
+     "Managing stress",
+     "Gérer le stress"
+    ],
+    "id": "RcGyVTAoXEU",
+    "yt_title": "How to Make Stress Your Friend | Kelly McGonigal | TED",
+    "author": "TED",
+    "sec": 869
+   }
+  ]
+ },
+ {
+  "cat": "health",
+  "price": 4.99,
+  "badge": "ESSENTIAL",
+  "t": [
+   "Nutrição Essencial",
+   "Essential Nutrition",
+   "Nutrition essentielle"
+  ],
+  "st": [
+   "Come de forma inteligente",
+   "Eat smart",
+   "Mange intelligemment"
+  ],
+  "d": [
+   "Macronutrientes, alimentação equilibrada e mitos comuns.",
+   "Macronutrients, balanced eating and common myths.",
+   "Macronutriments, alimentation équilibrée et mythes courants."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Nutrição básica",
+     "Nutrition basics",
+     "Bases de la nutrition"
+    ],
+    "id": "Qj_4uvzCqYk",
+    "yt_title": "Nutrition 101 - Understanding the Basics",
+    "author": "Raise the Bar Fitness",
+    "sec": 426
+   },
+   {
+    "titles": [
+     "Macronutrientes",
+     "Macronutrients",
+     "Macronutriments"
+    ],
+    "id": "smPR215SRzM",
+    "yt_title": "What Are Macronutrients? | Macros Explained",
+    "author": "Adam Explains",
+    "sec": 386
+   },
+   {
+    "titles": [
+     "Mitos alimentares",
+     "Food myths",
+     "Mythes alimentaires"
+    ],
+    "id": "XZ-QiD1pggM",
+    "yt_title": "10 Nutrition MYTHS Experts Wish Would Die",
+    "author": "Nutrition Made Simple!",
+    "sec": 1198
+   }
+  ]
+ },
+ {
+  "cat": "health",
+  "price": 12.99,
+  "badge": "PREMIUM",
+  "t": [
+   "Mindfulness e Saúde Mental",
+   "Mindfulness & Mental Health",
+   "Pleine conscience et santé mentale"
+  ],
+  "st": [
+   "Calma e foco no dia a dia",
+   "Calm and focus every day",
+   "Calme et concentration au quotidien"
+  ],
+  "d": [
+   "Meditação guiada, ansiedade e técnicas de respiração.",
+   "Guided meditation, anxiety and breathing techniques.",
+   "Méditation guidée, anxiété et techniques de respiration."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Meditação guiada de 10 minutos",
+     "10-minute guided meditation",
+     "Méditation guidée de 10 minutes"
+    ],
+    "id": "vj0JDwQLof4",
+    "yt_title": "10-Minute Guided Meditation: Self-Love | SELF",
+    "author": "SELF",
+    "sec": 559
+   },
+   {
+    "titles": [
+     "Respiração para a ansiedade",
+     "Breathing for anxiety",
+     "Respiration contre l’anxiété"
+    ],
+    "id": "tEmt1Znux58",
+    "yt_title": "Box breathing relaxation technique: how to calm feelings of stress or anxiety",
+    "author": "Sunnybrook Hospital",
+    "sec": 168
+   },
+   {
+    "titles": [
+     "Primeiros socorros emocionais",
+     "Emotional first aid",
+     "Premiers secours émotionnels"
+    ],
+    "id": "F2hc2FLOdhI",
+    "yt_title": "How to practice emotional first aid | Guy Winch | TED",
+    "author": "TED",
+    "sec": 1049
+   }
+  ]
+ },
+ {
+  "cat": "diy",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "Bricolage em Casa",
+   "Home DIY Basics",
+   "Bricolage à la maison"
+  ],
+  "st": [
+   "Reparações do dia a dia",
+   "Everyday repairs",
+   "Réparations du quotidien"
+  ],
+  "d": [
+   "Ferramentas essenciais, furar paredes e pequenas reparações.",
+   "Essential tools, drilling walls and small repairs.",
+   "Outils essentiels, percer les murs et petites réparations."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Ferramentas essenciais",
+     "Essential tools",
+     "Outils essentiels"
+    ],
+    "id": "64c5ienj2HY",
+    "yt_title": "Must-Have Tools for a New Homeowner",
+    "author": "Adam Savage’s Tested",
+    "sec": 470
+   },
+   {
+    "titles": [
+     "Pendurar coisas na parede",
+     "Hanging things on walls",
+     "Accrocher au mur"
+    ],
+    "id": "mcrw3sMpzto",
+    "yt_title": "How To Fix and Properly Install Screw In Drywall Anchors",
+    "author": "The Funny Carpenter",
+    "sec": 178
+   },
+   {
+    "titles": [
+     "Reparar buracos na parede",
+     "Patching drywall holes",
+     "Réparer les trous dans le mur"
+    ],
+    "id": "uvQK7WTkKpI",
+    "yt_title": "How to Fix Holes in Drywall - 4 Easy Methods",
+    "author": "LRN2DIY",
+    "sec": 938
+   }
+  ]
+ },
+ {
+  "cat": "diy",
+  "price": 4.99,
+  "badge": "ESSENTIAL",
+  "t": [
+   "Pintura e Acabamentos",
+   "Painting & Finishes",
+   "Peinture et finitions"
+  ],
+  "st": [
+   "Resultados profissionais",
+   "Professional results",
+   "Résultats professionnels"
+  ],
+  "d": [
+   "Preparar, pintar paredes e aplicar acabamentos como um profissional.",
+   "Prep, paint walls and apply finishes like a pro.",
+   "Préparer, peindre les murs et appliquer les finitions comme un pro."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Pintar uma divisão",
+     "Painting a room",
+     "Peindre une pièce"
+    ],
+    "id": "bLbUIevOxzY",
+    "yt_title": "How To Paint A Room | DIY For Beginners",
+    "author": "Home RenoVision DIY",
+    "sec": 1507
+   },
+   {
+    "titles": [
+     "Silicone e juntas",
+     "Caulking & joints",
+     "Silicone et joints"
+    ],
+    "id": "JerPx89WOi8",
+    "yt_title": "How to Caulk like a Pro",
+    "author": "HANDCRAFTED by Chris Palmer",
+    "sec": 282
+   },
+   {
+    "titles": [
+     "Assentar azulejo",
+     "Laying tile",
+     "Poser du carrelage"
+    ],
+    "id": "gNB5GCXuSDo",
+    "yt_title": "Beginners Step by Step Wall Tiling Guide - Everything You Need to Know",
+    "author": "The DIY Guy",
+    "sec": 958
+   }
+  ]
+ },
+ {
+  "cat": "diy",
+  "price": 12.99,
+  "badge": "PREMIUM",
+  "t": [
+   "Marcenaria para Iniciantes",
+   "Woodworking for Beginners",
+   "Menuiserie pour débutants"
+  ],
+  "st": [
+   "Constrói os teus móveis",
+   "Build your own furniture",
+   "Fabrique tes meubles"
+  ],
+  "d": [
+   "Medir, cortar, unir madeira e construir um primeiro projeto.",
+   "Measure, cut, join wood and build a first project.",
+   "Mesurer, couper, assembler le bois et réaliser un premier projet."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Começar na marcenaria",
+     "Getting started",
+     "Bien débuter"
+    ],
+    "id": "ZlDtdbkF1r8",
+    "yt_title": "How to Get Started with Woodworking | Beginner's Guide",
+    "author": "Casual Builds",
+    "sec": 559
+   },
+   {
+    "titles": [
+     "Uniões de madeira",
+     "Wood joints",
+     "Assemblages du bois"
+    ],
+    "id": "snjE9TF24dY",
+    "yt_title": "5 Woodworking Joints For Beginners",
+    "author": "Bent's Woodworking",
+    "sec": 436
+   },
+   {
+    "titles": [
+     "Primeiro projeto",
+     "First project",
+     "Premier projet"
+    ],
+    "id": "M74-mOoSFDA",
+    "yt_title": "10 Easy Woodworking Projects (Compilation)",
+    "author": "The Wood Whisperer",
+    "sec": 1063
+   }
+  ]
+ },
+ {
+  "cat": "ai",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "IA Generativa para Todos",
+   "Generative AI for Everyone",
+   "IA générative pour tous"
+  ],
+  "st": [
+   "ChatGPT e LLMs explicados",
+   "ChatGPT and LLMs explained",
+   "ChatGPT et LLM expliqués"
+  ],
+  "d": [
+   "Como funcionam os grandes modelos de linguagem e como usá-los bem.",
+   "How large language models work and how to use them well.",
+   "Comment fonctionnent les grands modèles de langage et comment bien les utiliser."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Introdução aos LLMs",
+     "Intro to LLMs",
+     "Introduction aux LLM"
+    ],
+    "id": "zjkBMFhNj_g",
+    "yt_title": "[1hr Talk] Intro to Large Language Models",
+    "author": "Andrej Karpathy",
+    "sec": 3588
+   },
+   {
+    "titles": [
+     "Large language models explicados",
+     "Large language models explained",
+     "Les LLM expliqués"
+    ],
+    "id": "LPZh9BOjkQs",
+    "yt_title": "Large Language Models explained briefly",
+    "author": "3Blue1Brown",
+    "sec": 478
+   },
+   {
+    "titles": [
+     "Engenharia de prompts",
+     "Prompt engineering",
+     "Ingénierie de prompts"
+    ],
+    "id": "_ZvnD73m40o",
+    "yt_title": "Prompt Engineering Tutorial – Master ChatGPT and LLM Responses",
+    "author": "freeCodeCamp.org",
+    "sec": 2496
+   }
+  ]
+ },
+ {
+  "cat": "ai",
+  "price": 4.99,
+  "badge": "ESSENTIAL",
+  "t": [
+   "Machine Learning: Fundamentos",
+   "Machine Learning Fundamentals",
+   "Fondamentaux du Machine Learning"
+  ],
+  "st": [
+   "Conceitos e algoritmos",
+   "Concepts and algorithms",
+   "Concepts et algorithmes"
+  ],
+  "d": [
+   "Aprendizagem supervisionada, regressão e classificação.",
+   "Supervised learning, regression and classification.",
+   "Apprentissage supervisé, régression et classification."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "O que é machine learning",
+     "What is machine learning",
+     "Qu’est-ce que le machine learning"
+    ],
+    "id": "PeMlggyqz0Y",
+    "yt_title": "Machine Learning Explained in 100 Seconds",
+    "author": "Fireship",
+    "sec": 155
+   },
+   {
+    "titles": [
+     "Regressão linear",
+     "Linear regression",
+     "Régression linéaire"
+    ],
+    "id": "7ArmBVF2dCs",
+    "yt_title": "Linear Regression, Clearly Explained!!!",
+    "author": "StatQuest with Josh Starmer",
+    "sec": 1647
+   },
+   {
+    "titles": [
+     "Árvores de decisão",
+     "Decision trees",
+     "Arbres de décision"
+    ],
+    "id": "_L39rN6gz7Y",
+    "yt_title": "Decision and Classification Trees, Clearly Explained!!!",
+    "author": "StatQuest with Josh Starmer",
+    "sec": 1088
+   }
+  ]
+ },
+ {
+  "cat": "design",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "Design Gráfico: Fundamentos",
+   "Graphic Design Fundamentals",
+   "Fondamentaux du design graphique"
+  ],
+  "st": [
+   "Cor, tipografia e composição",
+   "Colour, type and layout",
+   "Couleur, typographie et composition"
+  ],
+  "d": [
+   "Os princípios que todo o designer usa.",
+   "The principles every designer uses.",
+   "Les principes que tout designer utilise."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Princípios de design",
+     "Design principles",
+     "Principes du design"
+    ],
+    "id": "UmHMVU6dceA",
+    "yt_title": "Understanding the Principles of Design | Graphic Design Basic",
+    "author": "Canva",
+    "sec": 596
+   },
+   {
+    "titles": [
+     "Teoria da cor",
+     "Colour theory",
+     "Théorie des couleurs"
+    ],
+    "id": "_2LLXnUdUIc",
+    "yt_title": "Beginning Graphic Design: Color",
+    "author": "LearnFree",
+    "sec": 392
+   },
+   {
+    "titles": [
+     "Tipografia",
+     "Typography",
+     "Typographie"
+    ],
+    "id": "AXpxZMRM1EY",
+    "yt_title": "The ULTIMATE Guide To Typography For Beginners",
+    "author": "DesignSpo",
+    "sec": 810
+   }
+  ]
+ },
+ {
+  "cat": "food",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "Pão Caseiro",
+   "Homemade Bread",
+   "Pain maison"
+  ],
+  "st": [
+   "Do fermento ao forno",
+   "From yeast to oven",
+   "De la levure au four"
+  ],
+  "d": [
+   "Pão simples, focaccia e massa de pizza feitos em casa.",
+   "Simple bread, focaccia and pizza dough at home.",
+   "Pain simple, focaccia et pâte à pizza faits maison."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Pão simples",
+     "Simple bread",
+     "Pain simple"
+    ],
+    "id": "luP7v2BVWuU",
+    "yt_title": "A Bread Baking Tutorial | Bread Baking Basics for Beginners | Homemaking Basics",
+    "author": "Little Village Homestead",
+    "sec": 1377
+   },
+   {
+    "titles": [
+     "Focaccia",
+     "Focaccia",
+     "Focaccia"
+    ],
+    "id": "O1WQTKuWWfM",
+    "yt_title": "Big Bubble, NO-Knead Focaccia Bread | SOFT & EASY Focaccia!",
+    "author": "Emma's Goodies",
+    "sec": 387
+   },
+   {
+    "titles": [
+     "Massa de pizza",
+     "Pizza dough",
+     "Pâte à pizza"
+    ],
+    "id": "8Q_9h6VKm9c",
+    "yt_title": "How to Make NEAPOLITAN PIZZA DOUGH like a World Best Pizza Chef",
+    "author": "Vincenzo's Plate",
+    "sec": 977
+   }
+  ]
+ },
+ {
+  "cat": "food",
+  "price": 12.99,
+  "badge": "PREMIUM",
+  "t": [
+   "Cozinha Portuguesa",
+   "Portuguese Cuisine",
+   "Cuisine portugaise"
+  ],
+  "st": [
+   "Receitas tradicionais",
+   "Traditional recipes",
+   "Recettes traditionnelles"
+  ],
+  "d": [
+   "Pastéis de nata, bacalhau e outros clássicos portugueses.",
+   "Pastéis de nata, bacalhau and other Portuguese classics.",
+   "Pastéis de nata, morue et autres classiques portugais."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Pastéis de nata",
+     "Pastéis de nata",
+     "Pastéis de nata"
+    ],
+    "id": "lWLCxui1Mw8",
+    "yt_title": "How to Make Pastéis de Nata AKA Portuguese Custard Tarts | Cupcake Jemma",
+    "author": "CupcakeJemma",
+    "sec": 732
+   },
+   {
+    "titles": [
+     "Bacalhau à Brás",
+     "Bacalhau à Brás",
+     "Bacalhau à Brás"
+    ],
+    "id": "AejJbC3VMKU",
+    "yt_title": "Cristiano Ronaldo's favorite dish, Bacalhau à Brás",
+    "author": "Paulo's Food",
+    "sec": 393
+   },
+   {
+    "titles": [
+     "Caldo verde",
+     "Caldo verde",
+     "Caldo verde"
+    ],
+    "id": "MB5LAU5z9gk",
+    "yt_title": "Caldo Verde - Portuguese Sausage Kale Soup - Food Wishes",
+    "author": "Food Wishes",
+    "sec": 600
+   }
+  ]
+ },
+ {
+  "cat": "travel",
+  "price": 0,
+  "badge": "FREE",
+  "t": [
+   "Viajar com Pouco Dinheiro",
+   "Budget Travel",
+   "Voyager petit budget"
+  ],
+  "st": [
+   "Planeia a viagem ideal",
+   "Plan the perfect trip",
+   "Planifie le voyage idéal"
+  ],
+  "d": [
+   "Voos baratos, alojamento e fazer a mala leve.",
+   "Cheap flights, accommodation and packing light.",
+   "Vols pas chers, hébergement et voyager léger."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Encontrar voos baratos",
+     "Finding cheap flights",
+     "Trouver des vols pas chers"
+    ],
+    "id": "6HxyXcUlXSw",
+    "yt_title": "How to BOOK CHEAP FLIGHTS (Tricks that ACTUALLY work)",
+    "author": "Project Untethered",
+    "sec": 579
+   },
+   {
+    "titles": [
+     "Fazer a mala",
+     "Packing light",
+     "Faire sa valise léger"
+    ],
+    "id": "abh6Mt_JP2g",
+    "yt_title": "How To Pack A Carry-On Suitcase For A Two-Week Trip",
+    "author": "LOST iN",
+    "sec": 447
+   },
+   {
+    "titles": [
+     "Viajar sozinho",
+     "Solo travel tips",
+     "Voyager seul"
+    ],
+    "id": "Rm7mQl7VstM",
+    "yt_title": "SOLO TRAVEL MISTAKES TO AVOID ON YOUR FIRST SOLO TRIP",
+    "author": "KRod Collective",
+    "sec": 585
+   }
+  ]
+ },
+ {
+  "cat": "travel",
+  "price": 4.99,
+  "badge": "ESSENTIAL",
+  "t": [
+   "Descobrir Portugal",
+   "Discover Portugal",
+   "Découvrir le Portugal"
+  ],
+  "st": [
+   "Lisboa, Porto e mais",
+   "Lisbon, Porto and beyond",
+   "Lisbonne, Porto et plus"
+  ],
+  "d": [
+   "Guias de viagem para os destinos mais bonitos de Portugal.",
+   "Travel guides to Portugal’s most beautiful destinations.",
+   "Guides de voyage des plus belles destinations du Portugal."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Lisboa",
+     "Lisbon",
+     "Lisbonne"
+    ],
+    "id": "IF4mJ44xYMI",
+    "yt_title": "12 Essential Travel Tips when Visiting Lisbon, Portugal Guide",
+    "author": "Suitcase Monkey",
+    "sec": 772
+   },
+   {
+    "titles": [
+     "Porto",
+     "Porto",
+     "Porto"
+    ],
+    "id": "z33hDgMq39U",
+    "yt_title": "Porto, Portugal: Romantic Capital - Rick Steves’ Europe Travel Guide - Travel Bite",
+    "author": "Rick Steves' Europe",
+    "sec": 178
+   },
+   {
+    "titles": [
+     "Algarve",
+     "Algarve",
+     "Algarve"
+    ],
+    "id": "yXkw3vOmXpw",
+    "yt_title": "ALGARVE, PORTUGAL: Places to Visit and AVOID",
+    "author": "Dave in Portugal",
+    "sec": 861
+   }
+  ]
+ },
+ {
+  "cat": "fitness",
+  "price": 4.99,
+  "badge": "ESSENTIAL",
+  "t": [
+   "Treino em Casa Sem Equipamento",
+   "No-Equipment Home Workout",
+   "Entraînement à la maison sans matériel"
+  ],
+  "st": [
+   "Força e cardio",
+   "Strength and cardio",
+   "Force et cardio"
+  ],
+  "d": [
+   "Treinos completos de corpo inteiro para fazer em casa.",
+   "Full-body workouts you can do at home.",
+   "Des entraînements complets à faire chez soi."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Corpo inteiro para iniciantes",
+     "Full body for beginners",
+     "Corps entier débutant"
+    ],
+    "id": "cbKkB3POqaY",
+    "yt_title": "25 MIN FULL BODY HIIT for Beginners - No Equipment - No Repeat Home Workout",
+    "author": "growingannanas",
+    "sec": 1699
+   },
+   {
+    "titles": [
+     "HIIT 20 minutos",
+     "20-minute HIIT",
+     "HIIT 20 minutes"
+    ],
+    "id": "hLVh5IBsCxk",
+    "yt_title": "20 MIN KILLER HIIT Full Body Workout - No Equipment - No Repeat Cardio HIIT Home Workout",
+    "author": "growingannanas",
+    "sec": 1223
+   },
+   {
+    "titles": [
+     "Alongamentos",
+     "Stretching routine",
+     "Routine d’étirements"
+    ],
+    "id": "COO2S7lPBzA",
+    "yt_title": "10 Minute Total Body Stretch! [Daily Flexibility Routine for Beginners]",
+    "author": "Tone and Tighten",
+    "sec": 649
+   }
+  ]
+ },
+ {
+  "cat": "fitness",
+  "price": 12.99,
+  "badge": "PREMIUM",
+  "t": [
+   "Corrida: dos 0 aos 5 km",
+   "Running: Couch to 5K",
+   "Course : de 0 à 5 km"
+  ],
+  "st": [
+   "Começa a correr",
+   "Start running",
+   "Commence à courir"
+  ],
+  "d": [
+   "Técnica de corrida, plano de treino e prevenção de lesões.",
+   "Running technique, training plan and injury prevention.",
+   "Technique de course, plan d’entraînement et prévention des blessures."
+  ],
+  "lessons": [
+   {
+    "titles": [
+     "Técnica de corrida",
+     "Running technique",
+     "Technique de course"
+    ],
+    "id": "_kGESn8ArrU",
+    "yt_title": "How To Run Properly | Running Technique Explained",
+    "author": "Global Triathlon Network",
+    "sec": 575
+   },
+   {
+    "titles": [
+     "Plano para os 5 km",
+     "5K plan",
+     "Plan 5 km"
+    ],
+    "id": "Q_jljyvWTgo",
+    "yt_title": "Couch to 5K (how to succeed - beginners´ running tips)",
+    "author": "Living your best life 101",
+    "sec": 610
+   },
+   {
+    "titles": [
+     "Evitar lesões",
+     "Avoiding injuries",
+     "Éviter les blessures"
+    ],
+    "id": "eakmeWlzlhs",
+    "yt_title": "Common Running Injuries & How To Prevent Them",
+    "author": "Global Triathlon Network",
+    "sec": 637
+   }
+  ]
+ }
+]
