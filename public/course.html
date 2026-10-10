@@ -33,7 +33,7 @@ async function loadReviews(){const R=await api('/api/courses/'+id+'/reviews'),el
 async function buy(kind,lesson_id){if(!ME){location.href='/login.html?next='+encodeURIComponent(location.pathname+location.search);return}
  const amount=kind==='subscription'?39.99:kind==='lesson'?4.99:C.price;
  if(!confirm(`${t('confirm_pay')} ${eur(amount)}?\n${t('test_mode')}`))return;
- await api('/api/checkout',{method:'POST',body:{kind,course_id:C.id,lesson_id}});alert(t('paid_ok'));ME=await api('/api/me');await load();if(lesson_id)play(lesson_id)}
+ const r=await api('/api/checkout',{method:'POST',body:{kind,course_id:C.id,lesson_id,return_path:location.pathname+'?id='+C.id+(lesson_id?'&lesson='+lesson_id:'')}});if(r.url){location.href=r.url;return}alert(t('paid_ok'));ME=await api('/api/me');await load();if(lesson_id)play(lesson_id)}
 async function play(lid){flush();document.querySelectorAll('.lesson').forEach(b=>b.classList.toggle('cur',+b.dataset.l===lid));
  const box=document.getElementById('playerBox'),L=C.lessons.find(l=>l.id===lid);
  try{const v=await api('/api/lessons/'+lid+'/play');cur={...v,id:lid};viewId=null;acc=0;lastT=null;
