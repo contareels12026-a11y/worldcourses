@@ -1,20 +1,24 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=5"><link rel="stylesheet" href="/platform.css?v=5">
-<script src="/i18n.js?v=5"></script><script src="/app.js?v=5"></script><title>Administração — The World Courses</title></head><body data-page="admin">
+<link rel="stylesheet" href="/styles.css?v=9"><link rel="stylesheet" href="/platform.css?v=9">
+<script src="/i18n.js?v=9"></script><script src="/app.js?v=9"></script><title>Administração — The World Courses</title></head><body data-page="admin">
 <div id="chrome-top"></div>
 <main class="wrap page" id="adm"></main><div id="chrome-foot"></div>
 <script>
 const KEYS=[['platform_share',0.01],['w_complete',0.1],['complete_threshold',0.01],['min_pct',0.01],['partial_factor',0.1]];
 async function load(month){const m=document.getElementById('adm');
  if(!ME||ME.role!=='admin'){m.innerHTML=`<p class="err">${t('not_allowed')}</p><a class="btn gold" href="/login.html?next=/admin.html">${t('login')}</a>`;return}
- const r=await api('/api/admin/payouts'+(month?'?month='+month:''));const s=r.settings;
+ const r=await api('/api/admin/payouts'+(month?'?month='+month:''));const F=await api('/api/admin/feedback');const s=r.settings;
  m.innerHTML=`<div class="dash-head"><h1>${t('admin')} · ${t('payout_table')}</h1><label>${t('period')} <input type="month" id="month" value="${r.period.month}"></label></div>
  <div class="kpis"><div><span>${t('subs')}</span><b>${eur(r.revenue.subscription)}</b></div><div><span>${t('purchases_c')}</span><b>${eur(r.revenue.course)}</b></div><div><span>${t('purchases_l')}</span><b>${eur(r.revenue.lesson)}</b></div><div><span>${t('gross')}</span><b>${eur(r.gross)}</b></div><div><span>${t('platform_cut')} (${Math.round(s.platform_share*100)}%)</span><b>${eur(r.platform)}</b></div><div class="gold-k"><span>${t('pool')}</span><b>${eur(r.pool)}</b></div></div>
  <table class="tbl"><tr><th>${t('creator')}</th><th>${t('views')}</th><th>${t('completions')}</th><th>${t('partial')}</th><th>${t('ignored')}</th><th>${t('watch_min')}</th><th>${t('weight')}</th><th>${t('share')}</th><th>${t('est_earn')}</th></tr>
  ${r.table.map(x=>`<tr><td>${esc(x.name)}<br><small class="muted">${esc(x.email)}</small></td><td>${x.views}</td><td>${x.completions}</td><td>${x.partial}</td><td>${x.ignored}</td><td>${x.watch_minutes}</td><td>${x.weight}</td><td>${(x.share*100).toFixed(2)}%</td><td><b>${eur(x.earnings)}</b></td></tr>`).join('')}
  <tr class="tot"><td>Σ</td><td colspan="5"></td><td>${r.total_weight}</td><td>100%</td><td><b>${eur(r.table.reduce((a,x)=>a+x.earnings,0))}</b></td></tr></table>
- <h2>${t('settings')}</h2><form id="st" class="panel form-grid">${KEYS.map(([k,st])=>`<label>${t(k)}<input type="number" step="${st}" name="${k}" value="${s[k]}"></label>`).join('')}<button class="btn gold">${t('save')}</button><span id="stOk" class="ok"></span></form>
+ <h2>${t('settings')}</h2><form id="st" class="panel form-grid">${KEYS.map(([k,st])=>`<label>${t(k)}<input type="number" step="${st}" name="${k}" value="${s[k]}"></label>`).join('')}<label>${t('launch_date')}<input type="date" name="launch_date" value="${s.launch_date}"></label><label>${t('feedback_months')}<input type="number" min="0" max="36" name="feedback_months" value="${s.feedback_months}"></label>
+ <label>${t('promo_months')}<input type="number" min="0" max="24" name="promo_months" value="${s.promo_months}"></label><label class="chk">${t('promo_enabled')}<select name="promo_enabled"><option value="1" ${s.promo_enabled===1?'selected':''}>✓</option><option value="0" ${s.promo_enabled!==1?'selected':''}>✗</option></select></label>
+ <button class="btn gold">${t('save')}</button><span id="stOk" class="ok"></span></form>
+ <h2>${t('site_feedback')} ${F.count?`<span class="rv-avg">★ ${F.avg} · ${F.count}</span>`:''} <a class="btn ghost sm" href="/api/admin/feedback.csv">⬇ ${t('export_csv')}</a></h2>
+ ${F.count?`<table class="tbl"><tr><th>${t('date')}</th><th>${t('user')}</th><th>${t('rating')}</th><th>${t('fb_comment')}</th><th>${t('fb_improve')}</th></tr>${F.items.map(i=>`<tr><td>${esc(i.created_at.slice(0,16))}</td><td>${esc(i.name)}<br><small class="muted">${esc(i.email)}</small></td><td>${'★'.repeat(i.rating)}</td><td>${esc(i.comment)}</td><td>${esc(i.improve)}</td></tr>`).join('')}</table>`:`<div class="empty">${t('no_feedback')}</div>`}
  <p class="formula">w(v) = 0 se pct &lt; ${s.min_pct} · ${s.w_complete} se pct ≥ ${s.complete_threshold} · pct × ${s.partial_factor} × ${s.w_complete} caso contrário</p>`;
  document.getElementById('month').onchange=e=>load(e.target.value);
  document.getElementById('st').onsubmit=async e=>{e.preventDefault();try{await api('/api/admin/settings',{method:'PUT',body:Object.fromEntries(new FormData(e.target))});load(document.getElementById('month').value)}catch(x){alert('Erro: '+(x.data&&x.data.field||x.message))}}}

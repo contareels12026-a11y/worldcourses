@@ -69,5 +69,5 @@ const lessons=db.all('SELECT l.id,l.course_id,l.duration_sec,c.creator_id FROM l
 for(let k=0;k<1100;k++){const u=learners[Math.floor(rnd()*learners.length)],l=lessons[Math.floor(rnd()*lessons.length)];
   const r=rnd(),pct=r<0.45?0.92+rnd()*0.08:r<0.85?0.1+rnd()*0.8:rnd()*0.1;
   db.run('INSERT INTO views(user_id,lesson_id,course_id,creator_id,seconds,pct,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)',[u,l.id,l.course_id,l.creator_id,Math.round(pct*l.duration_sec),Math.min(1,pct),day(),day()])}
-db.saveNow();console.log('Seed concluído:',courses.length,'cursos,',lessons.length,'aulas,',learners.length,'alunos.');
+db.backfillLanguages();db.saveNow();console.log('Seed concluído:',courses.length,'cursos,',lessons.length,'aulas,',learners.length,'alunos.');
 })();

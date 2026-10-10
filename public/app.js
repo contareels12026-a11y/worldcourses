@@ -9,6 +9,12 @@ const api=async(url,opt={},tries=0)=>{let r;try{r=await fetch(url,{headers:{'Con
 const eur=v=>new Intl.NumberFormat({pt:'pt-PT',en:'en-IE',fr:'fr-FR'}[LANG],{style:'currency',currency:'EUR'}).format(v||0);
 const fmtDur=s=>{const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?`${h}h ${String(m).padStart(2,'0')}min`:`${m}min`};
 let ME=null;
+const FLAGS={pt:'🇵🇹',en:'🇬🇧',fr:'🇫🇷',es:'🇪🇸',de:'🇩🇪',it:'🇮🇹',none:'🔇'},SPOKEN=['pt','en','fr','es','de','it'];
+const langBadge=(code,cls='')=>code?`<span class="lang-dot ${cls}" title="${t('spoken')}: ${t('lang_'+code)}">${FLAGS[code]||'🌐'} ${code==='none'?t('no_dialogue'):code.toUpperCase()}</span>`:'';
+const ccBadge=(cls='')=>`<span class="cc-dot ${cls}" title="${t('cc_note')}">CC ${t('subtitles')}</span>`;
+const langOptions=(withNone)=>`<option value="" selected disabled>${t('choose_lang')}</option>`+[...SPOKEN,...(withNone?['none']:[])].map(c=>`<option value="${c}">${FLAGS[c]} ${t('lang_'+c)}</option>`).join('');
+const fmtDate=d=>new Date(d+'T00:00:00Z').toLocaleDateString({pt:'pt-PT',en:'en-GB',fr:'fr-FR'}[LANG],{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'UTC'});
+const promoHTML=p=>p&&p.promo?`<span class="promo-tag">${t('promo_badge')}</span><p class="price"><s class="old">${eur(p.subscription)}</s> ${eur(p.promo.price)} <small>${t('per_month')}</small></p><p class="promo-line">${t('promo_line').replace('{d}',fmtDate(p.promo.until))}</p>`:`<p class="price">${eur(p.subscription)} <small>${t('per_month')}</small></p>`;
 function applyI18n(root=document){if(root===document&&document.body.dataset.page){const p=document.body.dataset.page;if(I18N['meta_title_'+p])document.title=t('meta_title_'+p);const md=document.querySelector('meta[name=description]');if(md&&I18N['meta_desc_'+p])md.content=t('meta_desc_'+p)}document.documentElement.lang=LANG==='pt'?'pt-PT':LANG;
   root.querySelectorAll('[data-i18n]').forEach(e=>e.innerHTML=t(e.dataset.i18n));
   root.querySelectorAll('[data-i18n-ph]').forEach(e=>e.placeholder=t(e.dataset.i18nPh));

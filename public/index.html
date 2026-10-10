@@ -1,12 +1,12 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=5"><link rel="stylesheet" href="/platform.css?v=5">
-<script src="/i18n.js?v=5"></script><script src="/app.js?v=5"></script><title>The World Courses</title></head><body data-page="home">
+<link rel="stylesheet" href="/styles.css?v=9"><link rel="stylesheet" href="/platform.css?v=9">
+<script src="/i18n.js?v=9"></script><script src="/app.js?v=9"></script><title>The World Courses</title></head><body data-page="home">
 <div id="chrome-top"></div>
 <section class="hero"><div class="wrap hero-grid">
   <div class="hero-text"><p class="eyebrow" data-i18n="eyebrow"></p>
     <h1><span class="w" data-i18n="hero_1"></span><br><span class="w" data-i18n="hero_2"></span><br><span data-i18n="hero_3"></span></h1>
-    <p class="lead" data-i18n="hero_lead"></p>
+    <p class="lead" data-i18n="hero_lead"></p><a href="#planos" class="promo-hero" id="promoHero" hidden></a>
     <div class="cta"><a href="#cursos" class="btn gold"><span data-i18n="explore"></span> →</a><a href="/course.html?id=5" class="btn outline"><i class="play">▶</i> <span data-i18n="watch_video"></span></a></div>
     <div class="stats"><div><b>100K+</b><span data-i18n="st_courses"></span></div><div><b>50K+</b><span data-i18n="st_creators"></span></div><div><b>2M+</b><span data-i18n="st_students"></span></div><div><b>190+</b><span data-i18n="st_countries"></span></div></div></div>
   <div class="hero-visual"><div class="earth"></div><div class="arc"></div><p class="script" data-i18n="hero_script">A world<br>of knowledge<br>in your hands</p></div>
@@ -19,13 +19,13 @@
 <section id="cat" class="wrap sec"><div class="sec-head"><div><h2 data-i18n="cat_title"></h2><p data-i18n="cat_sub"></p></div><a href="#cursos" class="link" data-cat=""><span data-i18n="all_cats"></span> →</a></div>
 <div class="cats" id="cats"><a href="?cat=tech#cursos" data-cat="tech"><i>🖥️</i><span data-i18n="c_tech"></span></a><a href="?cat=mech#cursos" data-cat="mech"><i>🚗</i><span data-i18n="c_mech"></span></a><a href="?cat=biz#cursos" data-cat="biz"><i>📈</i><span data-i18n="c_biz"></span></a><a href="?cat=ai#cursos" data-cat="ai"><i>🤖</i><span data-i18n="c_ai"></span></a><a href="?cat=design#cursos" data-cat="design"><i>🎨</i><span data-i18n="c_design"></span></a><a href="?cat=health#cursos" data-cat="health"><i>💓</i><span data-i18n="c_health"></span></a><a href="?cat=food#cursos" data-cat="food"><i>👨‍🍳</i><span data-i18n="c_food"></span></a><a href="?cat=diy#cursos" data-cat="diy"><i>🏠</i><span data-i18n="c_diy"></span></a><a href="?cat=travel#cursos" data-cat="travel"><i>✈️</i><span data-i18n="c_travel"></span></a><a href="?cat=fitness#cursos" data-cat="fitness"><i>🏋️</i><span data-i18n="c_fitness"></span></a><a href="?cat=influencer#cursos" data-cat="influencer"><i>🤳</i><span data-i18n="c_influencer"></span></a><a href="?cat=more#cursos" data-cat="more"><i>⋯</i><span data-i18n="c_more"></span></a></div></section>
 <section id="cursos" class="wrap sec"><div class="sec-head"><div><h2 data-i18n="feat_title"></h2><p data-i18n="feat_sub"></p><p class="filter-note" id="filterNote"></p></div>
-  <div class="tabs-row"><div class="tabs" id="tabs"><button class="active" data-t="all" data-i18n="tab_all"></button><button data-t="pop" data-i18n="tab_pop"></button><button data-t="new" data-i18n="tab_new"></button><button data-t="prem" data-i18n="tab_prem"></button></div>
+  <div class="tabs-row"><select id="spokenFilter" class="spoken-filter" aria-label="Spoken language"></select><div class="tabs" id="tabs"><button class="active" data-t="all" data-i18n="tab_all"></button><button data-t="pop" data-i18n="tab_pop"></button><button data-t="new" data-i18n="tab_new"></button><button data-t="prem" data-i18n="tab_prem"></button></div>
   <button class="arrow" id="prev" aria-label="‹">‹</button><button class="arrow" id="next" aria-label="›">›</button></div></div>
   <div class="carousel" id="carousel"></div></section>
 <section id="planos" class="wrap promo-grid">
   <div class="mais"><div><h2><span class="w" data-i18n="more_1"></span><br><span data-i18n="more_2"></span></h2><p data-i18n="more_p"></p><a href="/course.html?id=7" class="btn outline"><i class="play">▶</i> <span data-i18n="watch_video"></span></a></div>
     <div class="mini"><span><i>💻</i><span data-i18n="m1"></span></span><span><i>🏅</i><span data-i18n="m2"></span></span><span><i>👥</i><span data-i18n="m3"></span></span><span><i>🎧</i><span data-i18n="m4"></span></span></div></div>
-  <div class="plan"><p class="crown">♛ ALL ACCESS</p><p class="price" id="subPrice">€39,99 <small data-i18n="per_month"></small></p><p class="sub" data-i18n="plan_sub"></p>
+  <div class="plan"><p class="crown">♛ ALL ACCESS</p><div id="subPrice"><p class="price">€39,99</p></div><p class="sub" data-i18n="plan_sub"></p>
     <ul><li data-i18n="p1"></li><li data-i18n="p2"></li><li data-i18n="p3"></li><li data-i18n="p4"></li></ul><a href="#" id="subscribeBtn" class="btn gold block"><span data-i18n="start_now"></span> →</a><p class="tiny" data-i18n="test_mode"></p></div>
   <div class="creator" id="criador"><div><h3 data-i18n="cr_title"></h3><p data-i18n="cr_sub"></p>
     <ul><li data-i18n="cr1"></li><li data-i18n="cr2"></li><li data-i18n="cr3"></li><li data-i18n="cr4"></li></ul><a href="/login.html?mode=signup&role=creator" class="btn outline sm"><span data-i18n="learn_more"></span> →</a></div><p class="script small" data-i18n="cr_script"></p></div>
@@ -37,4 +37,4 @@
     <figure><img src="assets/av4.jpg" alt=""><blockquote><span data-i18n="q3"></span><cite>Ana Ribeiro</cite><b>★★★★★</b></blockquote></figure>
     <figure><img src="assets/av6.jpg" alt=""><blockquote><span data-i18n="q4"></span><cite>Rui Costa</cite><b>★★★★★</b></blockquote></figure></div></section>
 <div id="chrome-foot"></div>
-<script src="/script.js?v=5" defer></script></body></html>
+<script src="/script.js?v=9" defer></script></body></html>

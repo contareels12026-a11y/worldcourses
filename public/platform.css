@@ -33,3 +33,17 @@ input,select,textarea{background:var(--bg2);border:1px solid var(--line);color:v
 .header .wrap{gap:18px}.mainnav a,.auth a,.who{white-space:nowrap}.logo small{white-space:nowrap}
 @media(max-width:1350px){.search{max-width:230px}.who{display:none}}
 button.btn{background:transparent}button.btn.gold{background:var(--grad)}
+
+.thumb-langs{position:absolute;left:8px;bottom:8px;display:flex;gap:4px}
+.lang-dot,.cc-dot{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 9px;font-size:11px;font-weight:700;background:#0b0f18e6;color:#fff;border:1px solid #ffffff40;white-space:nowrap}
+.cc-dot{background:#f4f1ea;color:#111;border-color:#f4f1ea}.lang-dot.sm,.cc-dot.sm{padding:2px 7px;font-size:10px}
+.langs-inline{display:inline-flex;gap:6px;margin-left:8px;vertical-align:middle}.cc-mini{font-size:9px;font-weight:800;border:1px solid var(--mut);border-radius:3px;padding:0 3px}
+.spoken-filter{padding:6px 10px;border-radius:8px;font-size:13px;max-width:220px}
+.promo-tag{display:inline-block;background:var(--grad);color:#111;font-size:10px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:.5px}
+s.old{color:var(--mut);font-size:.55em;font-weight:500;margin-right:4px}.promo-line{color:var(--gold);font-size:12px;margin:-2px 0 8px}
+.promo-hero{display:inline-block;margin:-10px 0 20px;background:#d8b46a1f;border:1px solid var(--gold2);color:var(--gold);border-radius:999px;padding:7px 14px;font-size:13px}.promo-hero s{color:var(--mut)}
+.modal-bg{position:fixed;inset:0;background:#000b;display:grid;place-items:center;z-index:100;padding:16px}.modal{background:var(--card);border:1.5px solid var(--gold2);border-radius:16px;padding:26px;max-width:480px;width:100%;display:flex;flex-direction:column;gap:10px}.modal label{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.star-pick.big span{font-size:38px}select.saved{border-color:#3ecf7a}
+.lrow{grid-template-columns:1.2fr 1.5fr 70px 1fr auto}
+.plan .price{font-size:34px;white-space:nowrap}.plan .price s.old{font-size:16px}.plan .price small{font-size:13px}
+.thumb-langs{bottom:auto;top:40px;left:10px}

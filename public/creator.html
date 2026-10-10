@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=5"><link rel="stylesheet" href="/platform.css?v=5">
-<script src="/i18n.js?v=5"></script><script src="/app.js?v=5"></script><title>Painel de Criador — The World Courses</title></head><body data-page="creator">
+<link rel="stylesheet" href="/styles.css?v=9"><link rel="stylesheet" href="/platform.css?v=9">
+<script src="/i18n.js?v=9"></script><script src="/app.js?v=9"></script><title>Painel de Criador — The World Courses</title></head><body data-page="creator">
 <div id="chrome-top"></div>
 <main class="wrap page" id="dash"></main><div id="chrome-foot"></div>
 <script>
@@ -13,20 +13,23 @@ async function load(month){const m=document.getElementById('dash');
  <div class="kpis"><div><span>${t('views')}</span><b>${k.views}</b></div><div><span>${t('completions')}</span><b>${k.completions}</b></div><div><span>${t('partial')}</span><b>${k.partial}</b></div><div><span>${t('watch_min')}</span><b>${k.watch_minutes}</b></div><div class="gold-k"><span>${t('est_earn')}</span><b>${eur(k.earnings)}</b></div></div>
  <div class="panel"><p>${t('pool_info')}: <b>${eur(s.pool)}</b> · ${t('weight')}: <b>${k.weight}</b> / ${s.total_weight} · ${t('share')}: <b>${(k.share*100).toFixed(2)}%</b> · ${t('ignored')}: ${k.ignored}</p><p class="tiny">${t('payout_note')}</p>
  <p class="formula">${t('est_earn')} = ${t('pool')} × (Σ ${t('weight')} / Σ ${t('weight')} total) · ${t('pool')} = ${t('gross')} × (1 − ${Math.round(s.settings.platform_share*100)}%)</p></div>
- <h2>${t('my_courses')}</h2><table class="tbl"><tr><th>${t('course')}</th><th>${t('list_price')}</th><th>${t('views')}</th><th>${t('completions')}</th><th>${t('watch_min')}</th></tr>
- ${s.perCourse.map(c=>{const x=cs.find(y=>y.id===c.id)||{};return`<tr><td><a href="/course.html?id=${c.id}">${esc(c.title)}</a></td><td>${x.is_free?t('free'):eur(x.price)}</td><td>${c.views}</td><td>${c.completions}</td><td>${c.minutes}</td></tr>`}).join('')}</table>
+ <h2>${t('my_courses')}</h2><table class="tbl"><tr><th>${t('course')}</th><th>${t('list_price')}</th><th>${t('spoken')}</th><th>${t('views')}</th><th>${t('completions')}</th><th>${t('watch_min')}</th></tr>
+ ${s.perCourse.map(c=>{const x=cs.find(y=>y.id===c.id)||{};return`<tr><td><a href="/course.html?id=${c.id}">${esc(c.title)}</a></td><td>${x.is_free?t('free'):eur(x.price)}</td><td><select class="lang-edit" data-c="${c.id}" required>${langOptions(false).replace(` value="${x.spoken_language}"`,` value="${x.spoken_language}" selected`).replace(x.spoken_language?'selected disabled':'@@','disabled')}</select></td><td>${c.views}</td><td>${c.completions}</td><td>${c.minutes}</td></tr>`}).join('')}</table>
  <h2>${t('new_course')}</h2><form id="nc" class="panel form-grid">
- <label>${t('title')}<input name="title" required></label><label>${t('subtitle')}<input name="subtitle"></label>
+ <label>${t('title')}<input name="title" required></label><label>${t('spoken')} *<select name="spoken_language" required>${langOptions(false)}</select></label><label>${t('subtitle')}<input name="subtitle"></label>
  <label class="full">${t('description')}<textarea name="description" rows="3"></textarea></label>
  <label>${t('category')}<select name="category">${CATS.map(c=>`<option value="${c}">${t('c_'+c).replace('<br>',' ')}</option>`).join('')}</select></label>
  <label>${t('list_price')}<select name="price"><option value="free">${t('free')}</option><option value="4.99">€4,99</option><option value="12.99" selected>€12,99</option></select></label>
  <div class="full" id="ls"></div><button type="button" class="btn ghost sm" id="addL">+ ${t('add_lesson')}</button>
  <button class="btn gold">${t('publish')}</button><p class="tiny full">${t('payout_note')}</p></form>`;
  document.getElementById('month').onchange=e=>load(e.target.value);
- const ls=document.getElementById('ls'),add=()=>{ls.insertAdjacentHTML('beforeend',`<div class="lrow"><input placeholder="${t('title')}" data-f="title" required><input placeholder="${t('video_link')}" data-f="video" required><input type="number" min="1" value="10" data-f="minutes" title="${t('minutes')}"><label class="chk"><input type="checkbox" data-f="free_preview"> ${t('preview_q')}</label></div>`)};add();
+ const ls=document.getElementById('ls'),add=()=>{ls.insertAdjacentHTML('beforeend',`<div class="lrow"><input placeholder="${t('title')}" data-f="title" required><input placeholder="${t('video_link')}" data-f="video" required><input type="number" min="1" value="10" data-f="minutes" title="${t('minutes')}"><select data-f="spoken_language" required title="${t('spoken')}">${langOptions(true)}</select><label class="chk"><input type="checkbox" data-f="free_preview"> ${t('preview_q')}</label></div>`)};add();
  document.getElementById('addL').onclick=add;
- document.getElementById('nc').onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));
-  f.lessons=[...ls.querySelectorAll('.lrow')].map(r=>({title:r.querySelector('[data-f=title]').value,video:r.querySelector('[data-f=video]').value,minutes:r.querySelector('[data-f=minutes]').value,free_preview:r.querySelector('[data-f=free_preview]').checked}));
-  const r=await api('/api/creator/courses',{method:'POST',body:f});alert(t('published_ok'));location.href='/course.html?id='+r.id}}
+ document.querySelectorAll('.lang-edit').forEach(sl=>sl.onchange=async()=>{if(!sl.value)return;await api('/api/creator/courses/'+sl.dataset.c+'/language',{method:'PUT',body:{spoken_language:sl.value}});sl.classList.add('saved')});
+ const nc=document.getElementById('nc');nc.addEventListener('invalid',e=>{if(e.target.matches('select'))e.target.setCustomValidity(t('err_spoken'))},true);nc.addEventListener('change',e=>{if(e.target.matches('select'))e.target.setCustomValidity('')});
+ nc.onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));
+  f.lessons=[...ls.querySelectorAll('.lrow')].map(r=>({title:r.querySelector('[data-f=title]').value,video:r.querySelector('[data-f=video]').value,minutes:r.querySelector('[data-f=minutes]').value,free_preview:r.querySelector('[data-f=free_preview]').checked,spoken_language:r.querySelector('[data-f=spoken_language]').value}));
+  if(!f.spoken_language||f.lessons.some(l=>!l.spoken_language)){alert(t('err_spoken'));return}
+  let r;try{r=await api('/api/creator/courses',{method:'POST',body:f})}catch(x){alert(x.message.startsWith('spoken')?t('err_spoken'):t('err_invalid'));return}alert(t('published_ok'));location.href='/course.html?id='+r.id}}
 READY.then(()=>load());
 </script></body></html>
