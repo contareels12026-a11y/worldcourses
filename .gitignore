@@ -2,3 +2,7 @@ node_modules/
 server.log
 shots/
 *.png
+.stripe-test.env
+.env
+.env.*
+*.env

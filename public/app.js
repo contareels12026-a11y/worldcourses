@@ -50,4 +50,5 @@ function renderAuth(){const html=ME?`${ME.role==='creator'?`<a href="/creator.ht
   for(const id of['authBox','authMobile']){const el=document.getElementById(id);if(el){el.innerHTML=html;applyI18n(el)}}
   document.querySelectorAll('#logoutBtn').forEach(b=>b.onclick=async e=>{e.preventDefault();await api('/api/logout',{method:'POST'});location.href='/'})}
 (function(){const s=localStorage.getItem('wc-theme');if(s)document.documentElement.dataset.theme=s})();
+addEventListener('load',()=>{const c=new URLSearchParams(location.search).get('checkout');if(c){const m={success:'paid_ok',cancel:'checkout_cancel',pending:'checkout_pending',error:'checkout_error'}[c];if(m)setTimeout(()=>alert(t(m)),300);const u=new URL(location);u.searchParams.delete('checkout');history.replaceState(null,'',u)}});
 const READY=(async()=>{if(document.readyState==="loading")await new Promise(r=>document.addEventListener("DOMContentLoaded",r));try{ME=await api('/api/me')}catch{}renderChrome();return ME})();
