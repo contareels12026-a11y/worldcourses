@@ -1,6 +1,6 @@
 // SQLite (sql.js / WebAssembly) com persistência em ficheiro data/app.sqlite
 const fs=require('fs'),path=require('path'),initSql=require('sql.js');
-const FILE=path.join(__dirname,'..','data','app.sqlite');
+const FILE=process.env.DB_FILE||path.join(__dirname,'..','data','app.sqlite');
 let db;
 const SCHEMA=`
 CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY,email TEXT UNIQUE NOT NULL,name TEXT NOT NULL,pass TEXT NOT NULL,role TEXT NOT NULL CHECK(role IN('user','creator','admin')),created_at TEXT DEFAULT CURRENT_TIMESTAMP);
@@ -16,6 +16,7 @@ async function init(){
   fs.mkdirSync(path.dirname(FILE),{recursive:true});
   db=fs.existsSync(FILE)?new SQL.Database(fs.readFileSync(FILE)):new SQL.Database();
   db.exec(SCHEMA);
+  try{db.exec('ALTER TABLE payments ADD COLUMN stripe_sub TEXT')}catch{}
   for(const[k,v]of Object.entries(DEFAULTS))run('INSERT OR IGNORE INTO settings(key,value) VALUES(?,?)',[k,v]);
   save();
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=3"><link rel="stylesheet" href="/platform.css?v=3">
-<script src="/i18n.js?v=3"></script><script src="/app.js?v=3"></script><title>Curso — The World Courses</title></head><body data-page="course">
+<link rel="stylesheet" href="/styles.css?v=5"><link rel="stylesheet" href="/platform.css?v=5">
+<script src="/i18n.js?v=5"></script><script src="/app.js?v=5"></script><title>Curso — The World Courses</title></head><body data-page="course">
 <div id="chrome-top"></div>
 <main class="wrap page" id="course"><p class="muted">…</p></main>
 <div id="chrome-foot"></div>
@@ -27,7 +27,7 @@ async function load(){C=await api('/api/courses/'+id+'?lang='+LANG);document.tit
 async function buy(kind,lesson_id){if(!ME){location.href='/login.html?next='+encodeURIComponent(location.pathname+location.search);return}
  const amount=kind==='subscription'?39.99:kind==='lesson'?4.99:C.price;
  if(!confirm(`${t('confirm_pay')} ${eur(amount)}?\n${t('test_mode')}`))return;
- await api('/api/checkout',{method:'POST',body:{kind,course_id:C.id,lesson_id}});alert(t('paid_ok'));ME=await api('/api/me');await load();if(lesson_id)play(lesson_id)}
+ const r=await api('/api/checkout',{method:'POST',body:{kind,course_id:C.id,lesson_id,return_path:location.pathname+'?id='+C.id+(lesson_id?'&lesson='+lesson_id:'')}});if(r.url){location.href=r.url;return}alert(t('paid_ok'));ME=await api('/api/me');await load();if(lesson_id)play(lesson_id)}
 async function play(lid){flush();document.querySelectorAll('.lesson').forEach(b=>b.classList.toggle('cur',+b.dataset.l===lid));
  const box=document.getElementById('playerBox'),L=C.lessons.find(l=>l.id===lid);
  try{const v=await api('/api/lessons/'+lid+'/play');cur={...v,id:lid};viewId=null;acc=0;lastT=null;

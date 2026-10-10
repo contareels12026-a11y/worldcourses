@@ -1,6 +1,11 @@
 const express=require('express'),session=require('express-session'),bcrypt=require('bcryptjs'),path=require('path');
 const db=require('./db'),SqliteStore=require('./sessionStore'),seo=require('./seo'),pay=require('./payments'),payout=require('./payout');
 const app=express();
+// webhook Stripe precisa do corpo em bruto: montado antes do express.json()
+app.post('/webhook',express.raw({type:'application/json',limit:'1mb'}),async(req,res)=>{
+  if(pay.MODE!=='stripe_test')return res.status(404).end();
+  try{const t=await pay.handleWebhook(req.body,req.headers['stripe-signature']);res.json({received:true,type:t})}
+  catch(e){console.error('webhook:',e.message);res.status(400).send('invalid')}});
 app.use(express.json());
 app.set('trust proxy',1);
 let sessionMw;app.use((req,res,next)=>sessionMw(req,res,next)); // criado depois de db.init()
@@ -67,9 +72,17 @@ app.post('/api/checkout',need('user','creator','admin'),async(req,res)=>{const{k
   else if(kind==='course'){const c=db.get('SELECT * FROM courses WHERE id=?',[+course_id]);if(!c||c.is_free)return res.status(400).json({error:'invalid'});amount=c.price;cid=c.id}
   else if(kind==='lesson'){const l=db.get('SELECT * FROM lessons WHERE id=?',[+lesson_id]);if(!l)return res.status(400).json({error:'invalid'});amount=pay.PRICES.lesson;lid=l.id;cid=l.course_id}
   else return res.status(400).json({error:'invalid'});
+  if(pay.MODE==='stripe_test'){try{const origin=process.env.PUBLIC_URL||`${req.protocol}://${req.get('host')}`;
+    const r=await pay.createCheckout({user:req.user,kind,amount,course_id:cid,lesson_id:lid,origin:origin.replace(/\/$/,''),returnPath:req.body.return_path&&String(req.body.return_path).startsWith('/')&&!String(req.body.return_path).startsWith('//')?req.body.return_path:'/'});
+    return res.json({ok:true,mode:pay.MODE,url:r.url,session_id:r.id,amount})}catch(e){console.error('checkout:',e.message);return res.status(502).json({error:'stripe'})}}
   const r=await pay.charge({kind,amount,user:req.user});
   db.run('INSERT INTO payments(user_id,kind,course_id,lesson_id,amount,provider,provider_ref,status,starts_at,ends_at) VALUES(?,?,?,?,?,?,?,?,?,?)',[req.user.id,kind,cid,lid,amount,r.provider,r.ref,r.status,starts,ends]);
   res.json({ok:true,mode:pay.MODE,ref:r.ref,amount})});
+// regresso do Stripe Checkout: verificação no servidor (sessão obtida à API), concede acesso de imediato
+app.get('/checkout/success',async(req,res)=>{if(pay.MODE!=='stripe_test')return res.redirect('/');
+  try{const r=await pay.fulfillSession(String(req.query.session_id||''));const back=(r.session&&r.session.metadata&&r.session.metadata.return_path)||'/';
+    const safe=back.startsWith('/')&&!back.startsWith('//')?back:'/';res.redirect(safe+(safe.includes('?')?'&':'?')+'checkout='+(r.ok?'success':'pending'))}
+  catch(e){console.error('success:',e.message);res.redirect('/?checkout=error')}});
 
 // ---- criador
 app.get('/api/creator/courses',need('creator','admin'),(req,res)=>res.json(db.all(COURSE_SQL+' WHERE c.creator_id=? ORDER BY c.id DESC',[req.user.id]).map(c=>({...courseOut(c,req.query.lang||'pt'),i18n:JSON.parse(c.i18n)}))));
@@ -93,5 +106,5 @@ app.put('/api/admin/settings',need('admin'),(req,res)=>{const lim={platform_shar
   res.json(db.settings())});
 
 const PORT=process.env.PORT||3000;
-db.init().then(()=>{sessionMw=session({store:new SqliteStore(),secret:process.env.SESSION_SECRET||'dev-secret-change-me',resave:false,saveUninitialized:false,rolling:true,cookie:{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production'?'auto':false,maxAge:7*864e5}});app.listen(PORT,()=>console.log(`The World Courses em http://localhost:${PORT} (pagamentos: ${pay.MODE}, demo tools: ${process.env.DEMO_TOOLS==='1'})`))});
+db.init().then(async()=>{try{await pay.setup()}catch(e){console.error('Stripe setup falhou:',e.message)}sessionMw=session({store:new SqliteStore(),secret:process.env.SESSION_SECRET||'dev-secret-change-me',resave:false,saveUninitialized:false,rolling:true,cookie:{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production'?'auto':false,maxAge:7*864e5}});app.listen(PORT,()=>console.log(`The World Courses em http://localhost:${PORT} (pagamentos: ${pay.MODE}, demo tools: ${process.env.DEMO_TOOLS==='1'})`))});
 for(const s of['SIGTERM','SIGINT'])process.on(s,()=>{try{db.saveNow()}catch{}process.exit(0)});

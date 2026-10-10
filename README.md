@@ -57,8 +57,14 @@ Todos os parâmetros (`platform_share`, `w_complete`, `complete_threshold`, `min
 ## Tracking de visualizações
 O leitor (YouTube IFrame API) conta o tempo realmente em reprodução e envia `POST /api/views` a cada 10 s (e ao sair da página). O servidor limita os segundos à duração da aula.
 
-## Ligar o Stripe (modo de TESTE)
-Ver comentários em `server/payments.js`: instalar `stripe`, definir `STRIPE_SECRET_KEY=sk_test_…` (**placeholder**), implementar `createStripeCheckout()` (Checkout Session) e um webhook `checkout.session.completed` que grava o pagamento. Até lá, todos os pagamentos são simulados (`provider = mock`).
+## Pagamentos Stripe (modo de TESTE)
+- Com `STRIPE_SECRET_KEY=sk_test_…` o checkout usa **Stripe Checkout**; sem chave, usa o modo **mock**. Chaves `sk_live_`/`rk_live_` são recusadas (o servidor não arranca) e qualquer objeto `livemode` é ignorado.
+- No arranque são criados (idempotentemente, por `lookup_key`) os preços: `wc_lesson_499`, `wc_course_499`, `wc_course_1299` (pagamento único) e `wc_sub_3999` (subscrição mensal €39,99).
+- Acesso concedido: (1) no regresso `/checkout/success?session_id=…` — a sessão é obtida no servidor à API Stripe e verificada; (2) via `POST /webhook` com `checkout.session.completed`, `invoice.paid` (renovações) e `customer.subscription.deleted` (termina o acesso). Com `STRIPE_WEBHOOK_SECRET` a assinatura é verificada; sem ele o evento é sempre re-obtido à API da Stripe pelo id (o corpo nunca é confiado).
+- Os pagamentos ficam na tabela `payments` (`provider=stripe_test`, idempotente por id de sessão/fatura) e entram na receita usada no cálculo dos pagamentos a criadores.
+- Cartão de teste: `4242 4242 4242 4242`, qualquer data futura e CVC.
+- No painel Stripe (teste), criar um endpoint de webhook para `https://<domínio>/webhook` com os 3 eventos acima e copiar o segredo para `STRIPE_WEBHOOK_SECRET`.
+- As chaves nunca devem ser commitadas (ver `.gitignore`). `STRIPE_PUBLISHABLE_KEY` não é necessária no Checkout alojado.
 
 ## Conteúdos e créditos
 Os vídeos são incorporações públicas do YouTube de freeCodeCamp.org, Programming with Mosh, Traversy Media, 3Blue1Brown, Blender Guru, Blender Foundation/Blender Studio (filmes CC BY), Tasty, TheCooknShare, Yoga With Adriene e Jacob + Katie Schwarz; os créditos aparecem em cada curso. As aulas usam excertos (início/duração aproximados) de vídeos longos. Os preços e a divisão em cursos pagos são **fictícios para demonstração** — antes de cobrar por conteúdo de terceiros é necessário licenciamento próprio.

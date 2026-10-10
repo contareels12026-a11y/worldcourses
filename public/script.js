@@ -14,7 +14,7 @@ READY.then(async()=>{
   car.innerHTML='<p class="muted">…</p>';COURSES=await api('/api/courses?lang='+LANG);render();
   const p=await api('/api/pricing');document.getElementById('subPrice').innerHTML=`${eur(p.subscription)} <small>${t('per_month')}</small>`;
   document.getElementById('subscribeBtn').onclick=async e=>{e.preventDefault();if(!ME)return location.href='/login.html?next=/%23planos';
-    if(!confirm(`${t('confirm_pay')} ${eur(p.subscription)}?\n${t('test_mode')}`))return;await api('/api/checkout',{method:'POST',body:{kind:'subscription'}});alert(t('paid_ok'));location.reload()};
+    if(!confirm(`${t('confirm_pay')} ${eur(p.subscription)}?\n${t('test_mode')}`))return;const r=await api('/api/checkout',{method:'POST',body:{kind:'subscription',return_path:'/#planos'}});if(r.url){location.href=r.url;return}alert(t('paid_ok'));location.reload()};
 });
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');TAB=b.dataset.t;render()});
 const step=el=>(el.firstElementChild?.offsetWidth||250)+16;
