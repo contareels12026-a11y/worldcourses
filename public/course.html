@@ -1,23 +1,23 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=6"><link rel="stylesheet" href="/platform.css?v=6">
-<script src="/i18n.js?v=6"></script><script src="/app.js?v=6"></script><title>Curso — The World Courses</title></head><body data-page="course">
+<link rel="stylesheet" href="/styles.css?v=9"><link rel="stylesheet" href="/platform.css?v=9">
+<script src="/i18n.js?v=9"></script><script src="/app.js?v=9"></script><title>Curso — The World Courses</title></head><body data-page="course">
 <div id="chrome-top"></div>
 <main class="wrap page" id="course"><p class="muted">…</p></main>
 <div id="chrome-foot"></div>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
-let C,player,cur=null,viewId=null,acc=0,lastT=null,hb;
+let PR=null,FB_ASKED=false,C,player,cur=null,viewId=null,acc=0,lastT=null,hb;
 const id=+new URLSearchParams(location.search).get('id');
-async function load(){C=await api('/api/courses/'+id+'?lang='+LANG);document.title=C.title+' — The World Courses';
+async function load(){if(!PR)try{PR=await api('/api/pricing')}catch{}C=await api('/api/courses/'+id+'?lang='+LANG);document.title=C.title+' — The World Courses';
  const m=document.getElementById('course');
  m.innerHTML=`<a href="/#cursos" class="link">← ${t('back')}</a>
- <div class="course-head"><div><span class="badge-inline ${C.is_free?'free':''}">${esc(C.badge)}</span><h1>${esc(C.title)}</h1><p class="lead2">${esc(C.description)}</p>
+ <div class="course-head"><div><span class="badge-inline ${C.is_free?'free':''}">${esc(C.badge)}</span><span class="langs-inline">${langBadge(C.spoken_language)}${C.mixed_languages?`<span class="lang-dot">🌐 ${t('mixed_langs')}</span>`:''}${C.captions?ccBadge():''}</span><h1>${esc(C.title)}</h1><p class="lead2">${esc(C.description)}</p>
  <p class="muted">${t('by')} <b>${esc(C.creator)}</b> · ${C.lessons.length} ${t('lessons')} · ${fmtDur(C.duration_sec)} · ${C.review_count?`★ ${C.rating} (${C.review_count})`:t('no_reviews')}</p>
  ${C.owned?`<p class="ok">✓ ${t('owned')}</p>`:''}${C.subscribed?`<p class="ok">✓ ALL ACCESS — ${t('sub_active')} ${(ME.subscription_until||'').slice(0,10)}</p>`:''}</div>
- ${!C.is_free&&!C.owned&&!C.subscribed?`<div class="buybox"><b class="big">${eur(C.price)}</b><button class="btn gold block" data-buy="course">${t('buy_course')}</button><button class="btn outline block" data-buy="subscription">${t('subscribe')} · €39,99</button><p class="tiny">${t('test_mode')}</p></div>`:''}</div>
+ ${!C.is_free&&!C.owned&&!C.subscribed?`<div class="buybox"><b class="big">${eur(C.price)}</b><button class="btn gold block" data-buy="course">${t('buy_course')}</button><button class="btn outline block" data-buy="subscription">${t('subscribe')} · ${PR&&PR.promo?`<s>${eur(PR.subscription)}</s> ${eur(PR.promo.price)}`:eur(PR?PR.subscription:39.99)}</button>${PR&&PR.promo?`<p class="tiny promo-line">${t('promo_line').replace('{d}',fmtDate(PR.promo.until))}</p>`:''}<p class="tiny">${t('test_mode')}</p></div>`:''}</div>
  <div class="course-grid"><div><div class="player" id="playerBox"><div class="placeholder"><img src="/${esc(C.image)}" alt=""><p>${t('select_lesson')}</p></div></div><p class="tiny" id="trackNote"></p></div>
- <aside class="lessons"><h3>${t('course_content')}</h3>${C.lessons.map(l=>`<button class="lesson ${l.unlocked?'':'lock'}" data-l="${l.id}"><span>${l.position}. ${esc(l.title)}</span><small>${fmtDur(l.duration_sec)} · ${l.free_preview?'<em class="pv">'+t('free_preview')+'</em>':l.unlocked?'▶':'🔒 '+t('locked')}</small></button>`).join('')}
+ <aside class="lessons"><h3>${t('course_content')}</h3>${C.lessons.map(l=>`<button class="lesson ${l.unlocked?'':'lock'}" data-l="${l.id}"><span>${l.position}. ${esc(l.title)}</span><small>${l.spoken_language&&l.spoken_language!==C.spoken_language?langBadge(l.spoken_language,'sm')+' ':''}${l.has_captions?'<span class="cc-mini">CC</span> ':''}${fmtDur(l.duration_sec)} · ${l.free_preview?'<em class="pv">'+t('free_preview')+'</em>':l.unlocked?'▶':'🔒 '+t('locked')}</small></button>`).join('')}
  <h4>${t('sources')}</h4><p class="tiny">${esc(C.source)}</p></aside></div><section class="reviews" id="reviews"></section>`;loadReviews();
  m.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>play(+b.dataset.l));
  m.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(b.dataset.buy));
@@ -34,11 +34,21 @@ async function buy(kind,lesson_id){if(!ME){location.href='/login.html?next='+enc
  const amount=kind==='subscription'?39.99:kind==='lesson'?4.99:C.price;
  if(!confirm(`${t('confirm_pay')} ${eur(amount)}?\n${t('test_mode')}`))return;
  const r=await api('/api/checkout',{method:'POST',body:{kind,course_id:C.id,lesson_id,return_path:location.pathname+'?id='+C.id+(lesson_id?'&lesson='+lesson_id:'')}});if(r.url){location.href=r.url;return}alert(t('paid_ok'));ME=await api('/api/me');await load();if(lesson_id)play(lesson_id)}
+// pedido de feedback sobre a PLATAFORMA a ~50% do curso (janela pós-lançamento; 1 vez por utilizador, "mais tarde" volta a perguntar 1 vez noutro curso)
+async function maybeFeedback(){if(FB_ASKED||!ME)return;try{const r=await api('/api/feedback/should?course_id='+id);if(!r.ask)return;FB_ASKED=true;showFeedback()}catch{}}
+function showFeedback(){const m=document.createElement('div');m.className='modal-bg';m.innerHTML=`<form class="modal" id="fbForm"><h2>${t('fb_title')}</h2><p class="muted">${t('fb_sub')}</p>
+ <div class="star-pick big">${[5,4,3,2,1].map(n=>`<label><input type="radio" name="rating" value="${n}"><span>★</span></label>`).join('')}</div>
+ <label>${t('fb_comment')}<textarea name="comment" rows="2" maxlength="2000"></textarea></label><label>${t('fb_improve')}<textarea name="improve" rows="2" maxlength="2000"></textarea></label>
+ <p class="err" id="fbErr"></p><div class="pw-btns"><button class="btn gold">${t('send')}</button><button type="button" class="btn outline" data-a="later">${t('fb_later')}</button><button type="button" class="btn ghost" data-a="dismiss">${t('fb_no')}</button></div></form>`;
+ document.body.appendChild(m);const f=m.querySelector('form');
+ m.querySelectorAll('[data-a]').forEach(b=>b.onclick=async()=>{await api('/api/feedback',{method:'POST',body:{action:b.dataset.a,course_id:id}}).catch(()=>{});m.remove()});
+ f.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));if(!d.rating){document.getElementById('fbErr').textContent=t('fb_need_rating');return}
+  await api('/api/feedback',{method:'POST',body:{...d,action:'submit',course_id:id,lang:LANG}});m.querySelector('.modal').innerHTML=`<h2>🙏 ${t('fb_thanks')}</h2>`;setTimeout(()=>m.remove(),1800)}}
 async function play(lid){flush();document.querySelectorAll('.lesson').forEach(b=>b.classList.toggle('cur',+b.dataset.l===lid));
  const box=document.getElementById('playerBox'),L=C.lessons.find(l=>l.id===lid);
  try{const v=await api('/api/lessons/'+lid+'/play');cur={...v,id:lid};viewId=null;acc=0;lastT=null;
   box.innerHTML='<div id="yt"></div>';
-  if(v.youtube_id){player=new YT.Player('yt',{videoId:v.youtube_id,playerVars:{start:v.start,rel:0,modestbranding:1},events:{onStateChange:onState}})}
+  if(v.youtube_id){player=new YT.Player('yt',{videoId:v.youtube_id,playerVars:{start:v.start,rel:0,modestbranding:1,hl:LANG,cc_load_policy:1,cc_lang_pref:LANG},events:{onStateChange:onState}})}
   else box.innerHTML=`<video controls src="${esc(v.video_url)}" id="vid"></video>`;
   document.getElementById('trackNote').textContent=v.can_track?'':'—';
   if(ME&&ME.role==='admin'&&window.DEMO_TOOLS)document.getElementById('trackNote').innerHTML=`<button class="btn ghost sm" id="sim">${t('simulate')} (admin/demo)</button>`,document.getElementById('sim').onclick=async()=>{acc=cur.duration_sec;await flush(true);alert(t('tracking'))};
@@ -50,7 +60,7 @@ async function play(lid){flush();document.querySelectorAll('.lesson').forEach(b=
 // tempo de visualização = tempo efetivamente reproduzido (não a posição), enviado a cada 10 s
 function onState(e){clearInterval(hb);if(e.data===1){lastT=Date.now();hb=setInterval(tick,10000)}else tick()}
 function tick(){if(lastT){acc+=(Date.now()-lastT)/1000;lastT=player&&player.getPlayerState&&player.getPlayerState()===1?Date.now():null}flush()}
-async function flush(force){if(!cur||!ME||(!acc&&!force))return;try{const r=await api('/api/views',{method:'POST',body:{lesson_id:cur.id,view_id:viewId,seconds:acc}});viewId=r.view_id;document.getElementById('trackNote').textContent=`${t('tracking')}: ${Math.round(Math.min(1,acc/cur.duration_sec)*100)}%`}catch{}}
+async function flush(force){if(!cur||!ME||(!acc&&!force))return;try{const r=await api('/api/views',{method:'POST',body:{lesson_id:cur.id,view_id:viewId,seconds:acc}});viewId=r.view_id;maybeFeedback();document.getElementById('trackNote').textContent=`${t('tracking')}: ${Math.round(Math.min(1,acc/cur.duration_sec)*100)}%`}catch{}}
 addEventListener('pagehide',()=>{if(cur&&ME&&acc)navigator.sendBeacon&&fetch('/api/views',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({lesson_id:cur.id,view_id:viewId,seconds:acc})})});
-READY.then(async()=>{try{window.DEMO_TOOLS=(await api('/api/config')).demo_tools}catch{}load()});
+READY.then(()=>setTimeout(maybeFeedback,1500));READY.then(async()=>{try{window.DEMO_TOOLS=(await api('/api/config')).demo_tools}catch{}load()});
 </script></body></html>
