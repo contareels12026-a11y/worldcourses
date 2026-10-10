@@ -1,9 +1,12 @@
 const express=require('express'),session=require('express-session'),bcrypt=require('bcryptjs'),path=require('path');
-const db=require('./db'),pay=require('./payments'),payout=require('./payout');
+const db=require('./db'),SqliteStore=require('./sessionStore'),seo=require('./seo'),pay=require('./payments'),payout=require('./payout');
 const app=express();
 app.use(express.json());
-app.use(session({secret:process.env.SESSION_SECRET||'dev-secret-change-me',resave:false,saveUninitialized:false,cookie:{httpOnly:true,sameSite:'lax',maxAge:7*864e5}}));
-app.use(express.static(path.join(__dirname,'..','public')));
+app.set('trust proxy',1);
+let sessionMw;app.use((req,res,next)=>sessionMw(req,res,next)); // criado depois de db.init()
+seo.mount(app);
+app.use(express.static(path.join(__dirname,'..','public'),{maxAge:'1h',setHeaders:(res,p)=>{if(p.endsWith('.html'))res.set('Cache-Control','no-cache')}}));
+app.get('/api/config',(req,res)=>res.json({demo_tools:process.env.DEMO_TOOLS==='1'}));
 const me=req=>req.session.uid?db.get('SELECT id,email,name,role FROM users WHERE id=?',[req.session.uid]):null;
 const need=(...roles)=>(req,res,next)=>{const u=me(req);if(!u)return res.status(401).json({error:'auth'});if(roles.length&&!roles.includes(u.role))return res.status(403).json({error:'forbidden'});req.user=u;next()};
 const L=(o,lang)=>{const j=JSON.parse(o);return j[lang]||j.pt||Object.values(j)[0]};
@@ -90,4 +93,5 @@ app.put('/api/admin/settings',need('admin'),(req,res)=>{const lim={platform_shar
   res.json(db.settings())});
 
 const PORT=process.env.PORT||3000;
-db.init().then(()=>app.listen(PORT,()=>console.log(`The World Courses em http://localhost:${PORT} (pagamentos: ${pay.MODE})`)));
+db.init().then(()=>{sessionMw=session({store:new SqliteStore(),secret:process.env.SESSION_SECRET||'dev-secret-change-me',resave:false,saveUninitialized:false,rolling:true,cookie:{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production'?'auto':false,maxAge:7*864e5}});app.listen(PORT,()=>console.log(`The World Courses em http://localhost:${PORT} (pagamentos: ${pay.MODE}, demo tools: ${process.env.DEMO_TOOLS==='1'})`))});
+for(const s of['SIGTERM','SIGINT'])process.on(s,()=>{try{db.saveNow()}catch{}process.exit(0)});

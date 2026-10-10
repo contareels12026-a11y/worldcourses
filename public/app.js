@@ -4,11 +4,12 @@ let LANG=localStorage.getItem('wc-lang')||(new URLSearchParams(location.search).
 const qLang=new URLSearchParams(location.search).get('lang');if(qLang&&LANGS.includes(qLang))LANG=qLang;
 const t=k=>{const v=I18N[k];return v?v[LANGS.indexOf(LANG)]:k};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const api=async(url,opt={})=>{const r=await fetch(url,{headers:{'Content-Type':'application/json'},credentials:'same-origin',...opt,body:opt.body?JSON.stringify(opt.body):undefined});let d=null;try{d=await r.json()}catch{}if(!r.ok){const e=new Error(d&&d.error||r.status);e.status=r.status;e.data=d;throw e}return d};
+const api=async(url,opt={},tries=0)=>{let r;try{r=await fetch(url,{headers:{'Content-Type':'application/json'},credentials:'same-origin',...opt,body:opt.body?JSON.stringify(opt.body):undefined})}catch(e){if(tries<5){await new Promise(z=>setTimeout(z,1500*(tries+1)));return api(url,opt,tries+1)}throw e}
+  if(r.status>=502&&r.status<=504&&tries<5&&(!opt.method||opt.method==='GET')){await new Promise(z=>setTimeout(z,1500*(tries+1)));return api(url,opt,tries+1)}let d=null;try{d=await r.json()}catch{}if(!r.ok){const e=new Error(d&&d.error||r.status);e.status=r.status;e.data=d;throw e}return d};
 const eur=v=>new Intl.NumberFormat({pt:'pt-PT',en:'en-IE',fr:'fr-FR'}[LANG],{style:'currency',currency:'EUR'}).format(v||0);
 const fmtDur=s=>{const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?`${h}h ${String(m).padStart(2,'0')}min`:`${m}min`};
 let ME=null;
-function applyI18n(root=document){document.documentElement.lang=LANG==='pt'?'pt-PT':LANG;
+function applyI18n(root=document){if(root===document&&document.body.dataset.page){const p=document.body.dataset.page;if(I18N['meta_title_'+p])document.title=t('meta_title_'+p);const md=document.querySelector('meta[name=description]');if(md&&I18N['meta_desc_'+p])md.content=t('meta_desc_'+p)}document.documentElement.lang=LANG==='pt'?'pt-PT':LANG;
   root.querySelectorAll('[data-i18n]').forEach(e=>e.innerHTML=t(e.dataset.i18n));
   root.querySelectorAll('[data-i18n-ph]').forEach(e=>e.placeholder=t(e.dataset.i18nPh));
   root.querySelectorAll('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.i18nAria)))}

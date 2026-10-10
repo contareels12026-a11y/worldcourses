@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/platform.css">
-<script src="/i18n.js"></script><script src="/app.js"></script><title>The World Courses</title></head><body>
+<link rel="stylesheet" href="/styles.css?v=3"><link rel="stylesheet" href="/platform.css?v=3">
+<script src="/i18n.js?v=3"></script><script src="/app.js?v=3"></script><title>The World Courses</title></head><body data-page="home">
 <div id="chrome-top"></div>
 <section class="hero"><div class="wrap hero-grid">
   <div class="hero-text"><p class="eyebrow" data-i18n="eyebrow"></p>
@@ -9,7 +9,7 @@
     <p class="lead" data-i18n="hero_lead"></p>
     <div class="cta"><a href="#cursos" class="btn gold"><span data-i18n="explore"></span> →</a><a href="/course.html?id=5" class="btn outline"><i class="play">▶</i> <span data-i18n="watch_video"></span></a></div>
     <div class="stats"><div><b>100K+</b><span data-i18n="st_courses"></span></div><div><b>50K+</b><span data-i18n="st_creators"></span></div><div><b>2M+</b><span data-i18n="st_students"></span></div><div><b>190+</b><span data-i18n="st_countries"></span></div></div></div>
-  <div class="hero-visual"><div class="earth"></div><div class="arc"></div><p class="script">A world<br>of knowledge<br>in your hands</p></div>
+  <div class="hero-visual"><div class="earth"></div><div class="arc"></div><p class="script" data-i18n="hero_script">A world<br>of knowledge<br>in your hands</p></div>
   <ul class="badges"><li><i>🎓</i><span data-i18n="b1"></span></li><li><i>👥</i><span data-i18n="b2"></span></li><li><i>🏅</i><span data-i18n="b3"></span></li><li><i>∞</i><span data-i18n="b4"></span></li></ul>
 </div>
 <div class="wrap"><div class="objective"><span class="q"><i>💻</i> <span data-i18n="goal_q"></span></span>
@@ -17,7 +17,7 @@
   <a href="#cursos" class="btn dark"><span data-i18n="search_btn"></span> →</a></div></div>
 </section>
 <section id="cat" class="wrap sec"><div class="sec-head"><div><h2 data-i18n="cat_title"></h2><p data-i18n="cat_sub"></p></div><a href="#cursos" class="link" data-cat=""><span data-i18n="all_cats"></span> →</a></div>
-<div class="cats" id="cats"></div></section>
+<div class="cats" id="cats"><a href="?cat=tech#cursos" data-cat="tech"><i>🖥️</i><span data-i18n="c_tech"></span></a><a href="?cat=mech#cursos" data-cat="mech"><i>🚗</i><span data-i18n="c_mech"></span></a><a href="?cat=biz#cursos" data-cat="biz"><i>📈</i><span data-i18n="c_biz"></span></a><a href="?cat=ai#cursos" data-cat="ai"><i>🤖</i><span data-i18n="c_ai"></span></a><a href="?cat=design#cursos" data-cat="design"><i>🎨</i><span data-i18n="c_design"></span></a><a href="?cat=health#cursos" data-cat="health"><i>💓</i><span data-i18n="c_health"></span></a><a href="?cat=food#cursos" data-cat="food"><i>👨‍🍳</i><span data-i18n="c_food"></span></a><a href="?cat=diy#cursos" data-cat="diy"><i>🏠</i><span data-i18n="c_diy"></span></a><a href="?cat=travel#cursos" data-cat="travel"><i>✈️</i><span data-i18n="c_travel"></span></a><a href="?cat=fitness#cursos" data-cat="fitness"><i>🏋️</i><span data-i18n="c_fitness"></span></a><a href="?cat=influencer#cursos" data-cat="influencer"><i>🤳</i><span data-i18n="c_influencer"></span></a><a href="?cat=more#cursos" data-cat="more"><i>⋯</i><span data-i18n="c_more"></span></a></div></section>
 <section id="cursos" class="wrap sec"><div class="sec-head"><div><h2 data-i18n="feat_title"></h2><p data-i18n="feat_sub"></p><p class="filter-note" id="filterNote"></p></div>
   <div class="tabs-row"><div class="tabs" id="tabs"><button class="active" data-t="all" data-i18n="tab_all"></button><button data-t="pop" data-i18n="tab_pop"></button><button data-t="new" data-i18n="tab_new"></button><button data-t="prem" data-i18n="tab_prem"></button></div>
   <button class="arrow" id="prev" aria-label="‹">‹</button><button class="arrow" id="next" aria-label="›">›</button></div></div>
@@ -37,4 +37,4 @@
     <figure><img src="assets/av4.jpg" alt=""><blockquote><span data-i18n="q3"></span><cite>Ana Ribeiro</cite><b>★★★★★</b></blockquote></figure>
     <figure><img src="assets/av6.jpg" alt=""><blockquote><span data-i18n="q4"></span><cite>Rui Costa</cite><b>★★★★★</b></blockquote></figure></div></section>
 <div id="chrome-foot"></div>
-<script src="/script.js" defer></script></body></html>
+<script src="/script.js?v=3" defer></script></body></html>

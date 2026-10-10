@@ -68,3 +68,9 @@ Os vídeos são incorporações públicas do YouTube de freeCodeCamp.org, Progra
 - Upload de ficheiros de vídeo não implementado: o criador cola um link YouTube ou um URL de vídeo direto.
 - Cursos criados pelo criador ficam com o mesmo texto nas 3 línguas (sem tradução automática).
 - Imagens dos cursos são fotos genéricas (picsum) e não correspondem ao tema.
+
+## Melhorias técnicas (out. 2026)
+- **Sessões persistentes**: guardadas na tabela `sessions` da mesma SQLite (`server/sessionStore.js`); sobrevivem a reinícios. Defina `SESSION_SECRET` estável em produção. (No Render, o disco é efémero: as sessões perdem-se a cada novo deploy.)
+- **Ferramentas de demonstração**: o botão "Simular visualização completa" só aparece a admins quando `DEMO_TOOLS=1`.
+- **SEO** (`server/seo.js`): título/descrição por idioma (`?lang=pt|en|fr`), Open Graph/Twitter, `canonical`, `hreflang`, `favicon.svg/.ico`, `/robots.txt`, `/sitemap.xml` (todas as páginas públicas × 3 idiomas). URL base via `PUBLIC_URL` (omissão: https://worldcourses.onrender.com).
+- **Arranque a frio**: os mosaicos de categorias estão no HTML (aparecem sempre) e os pedidos à API repetem automaticamente em caso de 502–504 (Render a acordar). Ficheiros JS/CSS com `?v=` para evitar cache antiga.

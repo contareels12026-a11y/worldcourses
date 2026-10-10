@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/platform.css">
-<script src="/i18n.js"></script><script src="/app.js"></script><title>Curso — The World Courses</title></head><body>
+<link rel="stylesheet" href="/styles.css?v=3"><link rel="stylesheet" href="/platform.css?v=3">
+<script src="/i18n.js?v=3"></script><script src="/app.js?v=3"></script><title>Curso — The World Courses</title></head><body data-page="course">
 <div id="chrome-top"></div>
 <main class="wrap page" id="course"><p class="muted">…</p></main>
 <div id="chrome-foot"></div>
@@ -35,7 +35,7 @@ async function play(lid){flush();document.querySelectorAll('.lesson').forEach(b=
   if(v.youtube_id){player=new YT.Player('yt',{videoId:v.youtube_id,playerVars:{start:v.start,rel:0,modestbranding:1},events:{onStateChange:onState}})}
   else box.innerHTML=`<video controls src="${esc(v.video_url)}" id="vid"></video>`;
   document.getElementById('trackNote').textContent=v.can_track?'':'—';
-  if(ME&&ME.role==='admin')document.getElementById('trackNote').innerHTML=`<button class="btn ghost sm" id="sim">${t('simulate')} (admin/demo)</button>`,document.getElementById('sim').onclick=async()=>{acc=cur.duration_sec;await flush(true);alert(t('tracking'))};
+  if(ME&&ME.role==='admin'&&window.DEMO_TOOLS)document.getElementById('trackNote').innerHTML=`<button class="btn ghost sm" id="sim">${t('simulate')} (admin/demo)</button>`,document.getElementById('sim').onclick=async()=>{acc=cur.duration_sec;await flush(true);alert(t('tracking'))};
  }catch(e){if(e.status!==402)throw e;const d=e.data;
   box.innerHTML=`<div class="paywall"><img src="/${esc(C.image)}" alt=""><div><h2>🔒 ${t('paywall_t')}</h2><p>${esc(L.title)}</p><p class="muted">${t('paywall_p')}</p>
   <div class="pw-btns"><button class="btn outline" data-k="lesson">${t('buy_lesson')} · ${eur(d.lesson_price)}</button><button class="btn gold" data-k="course">${t('buy_course')} · ${eur(d.course_price)}</button><button class="btn outline gold-b" data-k="subscription">${t('subscribe')} · ${eur(d.subscription)}</button></div>
@@ -46,5 +46,5 @@ function onState(e){clearInterval(hb);if(e.data===1){lastT=Date.now();hb=setInte
 function tick(){if(lastT){acc+=(Date.now()-lastT)/1000;lastT=player&&player.getPlayerState&&player.getPlayerState()===1?Date.now():null}flush()}
 async function flush(force){if(!cur||!ME||(!acc&&!force))return;try{const r=await api('/api/views',{method:'POST',body:{lesson_id:cur.id,view_id:viewId,seconds:acc}});viewId=r.view_id;document.getElementById('trackNote').textContent=`${t('tracking')}: ${Math.round(Math.min(1,acc/cur.duration_sec)*100)}%`}catch{}}
 addEventListener('pagehide',()=>{if(cur&&ME&&acc)navigator.sendBeacon&&fetch('/api/views',{method:'POST',keepalive:true,headers:{'Content-Type':'application/json'},body:JSON.stringify({lesson_id:cur.id,view_id:viewId,seconds:acc})})});
-READY.then(load);
+READY.then(async()=>{try{window.DEMO_TOOLS=(await api('/api/config')).demo_tools}catch{}load()});
 </script></body></html>
