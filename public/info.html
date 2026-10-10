@@ -1,0 +1,16 @@
+<!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=10"><link rel="stylesheet" href="/platform.css?v=10">
+<script src="/i18n.js?v=10"></script><script src="/app.js?v=10"></script><title>The World Courses</title></head><body data-page="info">
+<div id="chrome-top"></div>
+<main class="wrap page info-page"><nav class="info-nav" id="infoNav"></nav><div id="draftBanner"></div>
+<article id="infoBody" class="legal"></article></main>
+<div id="chrome-foot"></div>
+<script>
+const PAGES=[['faq','faq'],['terms','terms'],['privacy','privacy'],['refunds','refunds'],['creators','creator_terms']],LEGAL=['terms','privacy','refunds','creators'];
+const P=new URLSearchParams(location.search).get('p');const cur=PAGES.some(x=>x[0]===P)?P:'faq';
+READY.then(async()=>{document.getElementById('infoNav').innerHTML=PAGES.map(([k,l])=>`<a href="/info.html?p=${k}" class="${k===cur?'on':''}">${t(l)}</a>`).join('');
+ if(LEGAL.includes(cur))document.getElementById('draftBanner').innerHTML=`<div class="draft-banner" role="note"><b>⚠ ${t('draft_legal')}</b><span>${t('draft_note')}</span></div>`;
+ const b=document.getElementById('infoBody');const r=await fetch(`/content/${cur}.${LANG}.html`);if(r.ok)b.innerHTML=await r.text();
+ document.title=(b.querySelector('h1')?.textContent||'')+' — The World Courses';if(location.hash)document.querySelector(location.hash)?.scrollIntoView()});
+</script></body></html>

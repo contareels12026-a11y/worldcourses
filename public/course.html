@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=9"><link rel="stylesheet" href="/platform.css?v=9">
-<script src="/i18n.js?v=9"></script><script src="/app.js?v=9"></script><title>Curso — The World Courses</title></head><body data-page="course">
+<link rel="stylesheet" href="/styles.css?v=10"><link rel="stylesheet" href="/platform.css?v=10">
+<script src="/i18n.js?v=10"></script><script src="/app.js?v=10"></script><title>Curso — The World Courses</title></head><body data-page="course">
 <div id="chrome-top"></div>
 <main class="wrap page" id="course"><p class="muted">…</p></main>
 <div id="chrome-foot"></div>
@@ -26,8 +26,8 @@ async function load(){if(!PR)try{PR=await api('/api/pricing')}catch{}C=await api
 }
 async function buy(kind,lesson_id){if(!ME){location.href='/login.html?next='+encodeURIComponent(location.pathname+location.search);return}
  const amount=kind==='subscription'?39.99:kind==='lesson'?4.99:C.price;
- if(!confirm(`${t('confirm_pay')} ${eur(amount)}?\n${t('test_mode')}`))return;
- const r=await api('/api/checkout',{method:'POST',body:{kind,course_id:C.id,lesson_id,return_path:location.pathname+'?id='+C.id+(lesson_id?'&lesson='+lesson_id:'')}});if(r.url){location.href=r.url;return}alert(t('paid_ok'));ME=await api('/api/me');await load();if(lesson_id)play(lesson_id)}
+ if(!await checkoutConsent(`${t('confirm_pay')} ${eur(amount)}`))return;
+ const r=await api('/api/checkout',{method:'POST',body:{consent:true,kind,course_id:C.id,lesson_id,return_path:location.pathname+'?id='+C.id+(lesson_id?'&lesson='+lesson_id:'')}});if(r.url){location.href=r.url;return}alert(t('paid_ok'));ME=await api('/api/me');await load();if(lesson_id)play(lesson_id)}
 // pedido de feedback sobre a PLATAFORMA a ~50% do curso (janela pós-lançamento; 1 vez por utilizador, "mais tarde" volta a perguntar 1 vez noutro curso)
 async function maybeFeedback(){if(FB_ASKED||!ME)return;try{const r=await api('/api/feedback/should?course_id='+id);if(!r.ask)return;FB_ASKED=true;showFeedback()}catch{}}
 function showFeedback(){const m=document.createElement('div');m.className='modal-bg';m.innerHTML=`<form class="modal" id="fbForm"><h2>${t('fb_title')}</h2><p class="muted">${t('fb_sub')}</p>
