@@ -125,7 +125,7 @@ app.post('/api/billing/portal',need('user','creator','admin'),async(req,res)=>{
 // regresso do Stripe Checkout: verificação no servidor (sessão obtida à API), concede acesso de imediato
 app.get('/checkout/success',async(req,res)=>{if(pay.MODE!=='stripe_test')return res.redirect('/');
   try{const r=await pay.fulfillSession(String(req.query.session_id||''));const back=(r.session&&r.session.metadata&&r.session.metadata.return_path)||'/';
-    const safe=back.startsWith('/')&&!back.startsWith('//')?back:'/';res.redirect(safe+(safe.includes('?')?'&':'?')+'checkout='+(r.ok?'success':'pending'))}
+    const safe=back.startsWith('/')&&!back.startsWith('//')?back:'/';res.redirect(pay.withQuery(safe,'checkout',r.ok?'success':'pending'))}
   catch(e){console.error('success:',e.message);res.redirect('/?checkout=error')}});
 
 // ---- criador
@@ -189,5 +189,5 @@ app.put('/api/admin/settings',need('admin'),(req,res)=>{const lim={platform_shar
   res.json(db.settings())});
 
 const PORT=process.env.PORT||3000;
-db.init().then(async()=>{try{await pay.setup()}catch(e){console.error('Stripe setup falhou:',e.message)}pay.startPromoJob(()=>promoEnd());sessionMw=session({store:new SqliteStore(),secret:process.env.SESSION_SECRET||'dev-secret-change-me',resave:false,saveUninitialized:false,rolling:true,cookie:{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production'?'auto':false,maxAge:7*864e5}});app.listen(PORT,()=>console.log(`The World Courses em http://localhost:${PORT} (pagamentos: ${pay.MODE}, demo tools: ${process.env.DEMO_TOOLS==='1'})`))});
+db.init().then(async()=>{try{await pay.setup()}catch(e){console.error('Stripe setup falhou:',e.message)}pay.startPromoJob(()=>promoEnd());require('./receipts').start();sessionMw=session({store:new SqliteStore(),secret:process.env.SESSION_SECRET||'dev-secret-change-me',resave:false,saveUninitialized:false,rolling:true,cookie:{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production'?'auto':false,maxAge:7*864e5}});app.listen(PORT,()=>console.log(`The World Courses em http://localhost:${PORT} (pagamentos: ${pay.MODE}, demo tools: ${process.env.DEMO_TOOLS==='1'})`))});
 for(const s of['SIGTERM','SIGINT'])process.on(s,()=>{try{db.saveNow()}catch{}process.exit(0)});

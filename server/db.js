@@ -18,6 +18,8 @@ async function init(){
   db=fs.existsSync(FILE)?new SQL.Database(fs.readFileSync(FILE)):new SQL.Database();
   db.exec(SCHEMA);
   for(const q of['ALTER TABLE payments ADD COLUMN stripe_sub TEXT','ALTER TABLE payments ADD COLUMN stripe_customer TEXT','ALTER TABLE payments ADD COLUMN consent_at TEXT','ALTER TABLE payments ADD COLUMN canceled_at TEXT','ALTER TABLE courses ADD COLUMN spoken_language TEXT','ALTER TABLE lessons ADD COLUMN spoken_language TEXT','ALTER TABLE lessons ADD COLUMN has_captions INTEGER DEFAULT 0','ALTER TABLE payments ADD COLUMN promo TEXT'])try{db.exec(q)}catch{}
+  // recibos por email: pagamentos já existentes ficam marcados 'legacy' (nunca recebem email retroativo)
+  try{db.exec('ALTER TABLE payments ADD COLUMN receipt_sent_at TEXT');db.exec("UPDATE payments SET receipt_sent_at='legacy'")}catch(e){}
   db.exec(`CREATE TABLE IF NOT EXISTS site_feedback(id INTEGER PRIMARY KEY,user_id INTEGER NOT NULL,course_id INTEGER,rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),comment TEXT,improve TEXT,lang TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
     CREATE TABLE IF NOT EXISTS feedback_state(user_id INTEGER PRIMARY KEY,status TEXT NOT NULL,later_course_id INTEGER,updated_at TEXT DEFAULT CURRENT_TIMESTAMP);`);
   backfillLanguages();

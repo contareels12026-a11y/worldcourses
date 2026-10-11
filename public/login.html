@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=10"><link rel="stylesheet" href="/platform.css?v=10">
-<script src="/i18n.js?v=10"></script><script src="/app.js?v=10"></script><title>Entrar — The World Courses</title></head><body data-page="login">
+<link rel="stylesheet" href="/styles.css?v=11"><link rel="stylesheet" href="/platform.css?v=11">
+<script src="/i18n.js?v=11"></script><script src="/app.js?v=11"></script><title>Entrar — The World Courses</title></head><body data-page="login">
 <div id="chrome-top"></div>
 <main class="wrap page auth-page"><div class="auth-card">
  <div class="seg"><button id="mLogin" data-i18n="login"></button><button id="mSignup" data-i18n="signup"></button></div>
@@ -11,7 +11,6 @@
  <label><span data-i18n="password"></span><input name="password" type="password" required minlength="6" autocomplete="current-password"></label>
  <fieldset class="su roles"><legend data-i18n="i_am"></legend><label><input type="radio" name="role" value="user" checked> <span data-i18n="role_user"></span></label><label><input type="radio" name="role" value="creator"> <span data-i18n="role_creator"></span></label></fieldset>
  <p class="err" id="aErr"></p><button class="btn gold block" id="aBtn"></button></form>
- <details class="demo"><summary data-i18n="demo_accounts"></summary><p class="tiny">admin@worldcourses.test / Admin123!<br>mariana@worldcourses.test / Criador123!<br>ricardo@worldcourses.test / Criador123!<br>aluno@worldcourses.test / Aluno123!</p></details>
 </div></main><div id="chrome-foot"></div>
 <script>
 const P=new URLSearchParams(location.search);let mode=P.get('mode')==='signup'?'signup':'login';

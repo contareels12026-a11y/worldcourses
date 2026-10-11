@@ -7,8 +7,8 @@ if(fs.existsSync(db.FILE))fs.unlinkSync(db.FILE);
 await db.init();
 const H=p=>bcrypt.hashSync(p,10);
 const admin=db.run('INSERT INTO users(email,name,pass,role) VALUES(?,?,?,?)',['admin@worldcourses.test','Admin','' +H('Admin123!'),'admin']);
-const mariana=db.run('INSERT INTO users(email,name,pass,role) VALUES(?,?,?,?)',['mariana@worldcourses.test','Mariana Costa',H('Criador123!'),'creator']);
-const ricardo=db.run('INSERT INTO users(email,name,pass,role) VALUES(?,?,?,?)',['ricardo@worldcourses.test','Ricardo Almeida',H('Criador123!'),'creator']);
+const mariana=db.run('INSERT INTO users(email,name,pass,role) VALUES(?,?,?,?)',['mariana@worldcourses.test','Curadoria The World Courses',H('Criador123!'),'creator']);
+const ricardo=db.run('INSERT INTO users(email,name,pass,role) VALUES(?,?,?,?)',['ricardo@worldcourses.test','Curadoria The World Courses',H('Criador123!'),'creator']);
 const aluno=db.run('INSERT INTO users(email,name,pass,role) VALUES(?,?,?,?)',['aluno@worldcourses.test','Sofia Martins',H('Aluno123!'),'user']);
 const SRC=a=>`Vídeos: ${a} (YouTube, incorporação pública). Créditos aos autores originais.`;
 const courses=[

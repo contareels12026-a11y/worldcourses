@@ -34,6 +34,8 @@ async function setup(){
   console.log('Stripe (teste) pronto:',Object.keys(priceIds).length,'preços');
 }
 function lookupFor(kind,amount){if(kind==='subscription')return'wc_sub_3999';if(kind==='lesson')return'wc_lesson_499';return amount>5?'wc_course_1299':'wc_course_499'}
+// acrescenta ?k=v ANTES do #hash (ex.: /#planos -> /?checkout=success#planos)
+function withQuery(p,k,v){const i=p.indexOf('#'),base=i<0?p:p.slice(0,i),hash=i<0?'':p.slice(i);return base+(base.includes('?')?'&':'?')+k+'='+encodeURIComponent(v)+hash}
 async function createCheckout({user,kind,amount,promo,course_id,lesson_id,origin,returnPath,consentAt}){
   const meta={app:'worldcourses',consent_at:String(consentAt||''),user_id:String(user.id),kind,course_id:String(course_id||''),lesson_id:String(lesson_id||''),return_path:String(returnPath||'/').slice(0,400),promo_until:promo?String(Math.floor(promo/1000)):''};
   const coupon=kind==='subscription'&&promo?await ensureCoupon(promo):null;
@@ -44,7 +46,7 @@ async function createCheckout({user,kind,amount,promo,course_id,lesson_id,origin
     client_reference_id:String(user.id),customer_email:user.email,metadata:meta,
     ...(kind==='subscription'?{subscription_data:{metadata:meta}}:{payment_intent_data:{metadata:meta}}),
     success_url:`${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:`${origin}${meta.return_path}${meta.return_path.includes('?')?'&':'?'}checkout=cancel`});
+    cancel_url:origin+withQuery(meta.return_path,'checkout','cancel')});
   return{url:s.url,id:s.id};
 }
 const iso=ts=>new Date(ts*1000).toISOString().replace('T',' ').slice(0,19);
@@ -123,4 +125,4 @@ function startPromoJob(getEnd){if(!stripe)return;const run=async()=>{try{const e
 async function charge({kind,amount}){ // modo mock
   return{provider:'mock',ref:'mock_'+kind+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),status:'paid',amount};
 }
-module.exports={portalSession,subStatus,PROMO,startPromoJob,PRICES,MODE,setup,createCheckout,fulfillSession,handleWebhook,charge,stripe:()=>stripe};
+module.exports={withQuery,portalSession,subStatus,PROMO,startPromoJob,PRICES,MODE,setup,createCheckout,fulfillSession,handleWebhook,charge,stripe:()=>stripe};
