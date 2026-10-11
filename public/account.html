@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=10"><link rel="stylesheet" href="/platform.css?v=10">
+<script src="/i18n.js?v=10"></script><script src="/app.js?v=10"></script><title>A minha conta — The World Courses</title></head><body data-page="account">
+<div id="chrome-top"></div>
+<main class="wrap page account-page"><h1 data-i18n="my_account"></h1><div id="accMsg"></div>
+<section class="acc-card"><h2 data-i18n="acc_sub"></h2><div id="accSub"><p class="muted">…</p></div></section>
+<section class="acc-card"><h2 data-i18n="acc_purchases"></h2><div id="accBuys"></div></section></main>
+<div id="chrome-foot"></div>
+<script>
+const dt=s=>s?new Date(s.replace(' ','T')+'Z').toLocaleDateString(LANG==='en'?'en-GB':LANG==='fr'?'fr-FR':'pt-PT'):'';
+const nm=j=>{try{const x=JSON.parse(j);return(x[LANG]||x.pt).title}catch{return''}};
+async function load(){const a=await api('/api/account'),s=a.subscription,el=document.getElementById('accSub');
+ if(!s||!s.active){el.innerHTML=`<p>${t('acc_none')}${s?` <span class="muted">(${t('acc_expired')} ${dt(s.ends_at)})</span>`:''}</p><a class="btn gold" href="/#planos">${t('acc_subscribe')}</a>`}
+ else{el.innerHTML=`<p class="acc-status ${s.canceled?'off':'on'}">${s.canceled?t('acc_canceled_until'):t('acc_active_until')} <b>${dt(s.ends_at)}</b> · ${eur(s.amount)}${t('per_month')}${s.promo?` <em class="pill">${t('acc_promo')}</em>`:''}</p>
+  ${s.provider==='stripe_test'?`<button class="btn gold" id="portalBtn">${t('acc_manage')}</button><p class="tiny muted">${t('acc_manage_note')}</p>`:(s.canceled?'':`<button class="btn ghost" id="mockCancel">${t('acc_cancel_mock')}</button><p class="tiny muted">${t('test_mode')}</p>`)}`;
+  document.getElementById('portalBtn')?.addEventListener('click',async e=>{e.target.disabled=true;try{const r=await api('/api/billing/portal',{method:'POST'});location.href=r.url}catch{e.target.disabled=false;alert(t('acc_err'))}});
+  document.getElementById('mockCancel')?.addEventListener('click',async()=>{if(!confirm(t('acc_cancel_confirm')))return;await api('/api/billing/portal',{method:'POST'});document.getElementById('accMsg').innerHTML=`<p class="ok-msg">${t('acc_canceled_ok')}</p>`;load()})}
+ document.getElementById('accBuys').innerHTML=a.purchases.length?`<table class="tbl"><tbody>${a.purchases.map(p=>`<tr><td>${dt(p.created_at)}</td><td>${t('kind_'+p.kind)}</td><td>${esc(p.kind==='lesson'?nm(p.lesson_i18n):p.kind==='course'?nm(p.course_i18n):'All Access')}</td><td>${eur(p.amount)}</td></tr>`).join('')}</tbody></table>`:`<p class="muted">${t('acc_no_purchases')}</p>`}
+READY.then(()=>{if(!ME){location.href='/login.html?next=/account.html';return}
+ if(new URLSearchParams(location.search).get('portal')==='return'){document.getElementById('accMsg').innerHTML=`<p class="ok-msg">${t('acc_portal_back')}</p>`;history.replaceState(null,'','/account.html')}load()});
+</script></body></html>

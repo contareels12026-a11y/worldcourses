@@ -22,7 +22,7 @@ function applyI18n(root=document){if(root===document&&document.body.dataset.page
 const LOGO=`<a href="/" class="logo"><span class="logo-word"><span class="logo-c">C</span><span class="globe"></span>URSES</span><small>LEARN · GROW · EXPLORE · ANYWHERE</small></a>`;
 function renderChrome(){
   const top=document.getElementById('chrome-top');if(top)top.innerHTML=`
-<div class="topbar"><div class="wrap"><span data-i18n="topbar"></span><nav><a href="#" data-i18n="help"></a><a href="#footer" data-i18n="contacts"></a>
+<div class="topbar"><div class="wrap"><span data-i18n="topbar"></span><nav><a href="/info.html?p=faq" data-i18n="help"></a><a href="#footer" data-i18n="contacts"></a>
 <select id="langSel" class="lang" aria-label="Idioma / Language / Langue">${[['pt','🇵🇹 Português (PT)'],['en','🇬🇧 English'],['fr','🇫🇷 Français']].map(([v,l])=>`<option value="${v}" ${v===LANG?'selected':''}>${l}</option>`).join('')}</select></nav></div></div>
 <header class="header"><div class="wrap">${LOGO}
 <nav class="mainnav" id="mainnav"><a href="/#cat" data-i18n="nav_categories"></a><a href="/#cursos" data-i18n="nav_courses"></a><a href="/creator.html" data-i18n="nav_creators"></a><a href="/#planos" data-i18n="nav_plans"></a><a href="#footer" data-i18n="nav_about"></a>
@@ -36,7 +36,7 @@ function renderChrome(){
 <footer id="footer"><div class="wrap foot">${LOGO}
 <div><h4 data-i18n="f_platform"></h4><a href="/#cat" data-i18n="nav_categories"></a><a href="/#cursos" data-i18n="nav_courses"></a><a href="/creator.html" data-i18n="nav_creators"></a><a href="/#planos" data-i18n="nav_plans"></a></div>
 <div><h4 data-i18n="f_company"></h4><a data-i18n="nav_about"></a><a data-i18n="blog"></a><a data-i18n="careers"></a><a data-i18n="contacts"></a></div>
-<div><h4 data-i18n="f_support"></h4><a data-i18n="help"></a><a data-i18n="terms"></a><a data-i18n="privacy"></a><a data-i18n="cookies"></a></div>
+<div><h4 data-i18n="f_support"></h4><a href="/info.html?p=faq" data-i18n="faq"></a><a href="/info.html?p=terms" data-i18n="terms"></a><a href="/info.html?p=privacy" data-i18n="privacy"></a><a href="/info.html?p=privacy#cookies" data-i18n="cookies"></a><a href="/info.html?p=refunds" data-i18n="refunds"></a><a href="/info.html?p=creators" data-i18n="creator_terms"></a></div>
 <div><h4 data-i18n="f_follow"></h4><div class="socials"><a aria-label="Instagram">◎</a><a aria-label="YouTube">▶</a><a aria-label="LinkedIn">in</a><a aria-label="X">𝕏</a><a aria-label="Facebook">f</a><a aria-label="TikTok">♪</a></div></div>
 <div><h4 data-i18n="f_news"></h4><form class="news" id="newsForm"><input type="email" required data-i18n-ph="email_ph"><button>→</button></form></div></div>
 <div class="wrap copy"><span data-i18n="rights"></span><span>Learn. Grow. Explore. Anywhere. <a href="#" class="up">↑</a></span></div></footer>`;
@@ -51,7 +51,15 @@ function renderChrome(){
   document.getElementById('searchForm')?.addEventListener('submit',e=>{e.preventDefault();location.href='/?q='+encodeURIComponent(document.getElementById('searchInput').value)+'#cursos'});
 }
 async function loadStats(){if(!document.querySelector('[data-stat]'))return;try{const s=await api('/api/stats');document.querySelectorAll('[data-stat]').forEach(e=>e.textContent=s[e.dataset.stat])}catch{}}
-function renderAuth(){const html=ME?`${ME.role==='creator'?`<a href="/creator.html" class="entrar" data-i18n="dashboard"></a>`:''}${ME.role==='admin'?`<a href="/admin.html" class="entrar" data-i18n="admin"></a>`:''}<span class="who">👤 ${esc(ME.name)}${ME.subscription_until?' <em class="pill">ALL ACCESS</em>':''}</span><a href="#" class="btn ghost sm" id="logoutBtn" data-i18n="logout"></a>`
+// Consentimento obrigatório antes do checkout (conteúdo digital: início imediato + perda do direito de livre resolução de 14 dias)
+function checkoutConsent(amountLabel){return new Promise(res=>{const m=document.createElement('div');m.className='modal-bg';
+ m.innerHTML=`<form class="modal consent-modal"><h2>${t('consent_title')}</h2><p><b>${esc(amountLabel)}</b></p><p class="tiny muted">${t('test_mode')}</p>
+ <label class="chk"><input type="checkbox" name="c" required> <span>${t('consent_text')}</span></label>
+ <p class="tiny"><a href="/info.html?p=refunds" target="_blank">${t('refunds')}</a> · <a href="/info.html?p=terms" target="_blank">${t('terms')}</a></p>
+ <div class="row"><button type="button" class="btn ghost" data-x>${t('cancel')}</button><button class="btn gold" disabled>${t('consent_go')}</button></div></form>`;
+ document.body.appendChild(m);const f=m.querySelector('form'),cb=f.c,go=f.querySelector('.btn.gold');cb.onchange=()=>go.disabled=!cb.checked;
+ const done=v=>{m.remove();res(v)};m.querySelector('[data-x]').onclick=()=>done(false);m.onclick=e=>{if(e.target===m)done(false)};f.onsubmit=e=>{e.preventDefault();if(cb.checked)done(true)}})}
+function renderAuth(){const html=ME?`${ME.role==='creator'?`<a href="/creator.html" class="entrar" data-i18n="dashboard"></a>`:''}${ME.role==='admin'?`<a href="/admin.html" class="entrar" data-i18n="admin"></a>`:''}<a href="/account.html" class="who">👤 ${esc(ME.name)}${ME.subscription_until?' <em class="pill">ALL ACCESS</em>':''}</a><a href="#" class="btn ghost sm" id="logoutBtn" data-i18n="logout"></a>`
   :`<a href="/login.html" class="entrar" data-i18n="login"></a><a href="/login.html?mode=signup" class="btn gold sm" data-i18n="signup"></a>`;
   for(const id of['authBox','authMobile']){const el=document.getElementById(id);if(el){el.innerHTML=html;applyI18n(el)}}
   document.querySelectorAll('#logoutBtn').forEach(b=>b.onclick=async e=>{e.preventDefault();await api('/api/logout',{method:'POST'});location.href='/'})}

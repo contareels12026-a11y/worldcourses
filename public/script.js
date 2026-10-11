@@ -18,7 +18,7 @@ READY.then(async()=>{
   sel.onchange=()=>{SPK=sel.value;render()};render();
   const p=await api('/api/pricing');document.getElementById('subPrice').innerHTML=promoHTML(p);const hb=document.getElementById('promoHero');if(hb&&p.promo){hb.innerHTML=`♛ ALL ACCESS · <s>${eur(p.subscription)}</s> <b>${t('promo_line').replace('{d}',fmtDate(p.promo.until))}</b>`;hb.hidden=false}
   document.getElementById('subscribeBtn').onclick=async e=>{e.preventDefault();if(!ME)return location.href='/login.html?next=/%23planos';
-    if(!confirm(`${t('confirm_pay')} ${eur(p.subscription)}?\n${t('test_mode')}`))return;const r=await api('/api/checkout',{method:'POST',body:{kind:'subscription',return_path:'/#planos'}});if(r.url){location.href=r.url;return}alert(t('paid_ok'));location.reload()};
+    if(!await checkoutConsent(`All Access — ${p.promo?eur(p.promo.price):eur(p.subscription)}${t('per_month')}`))return;const r=await api('/api/checkout',{method:'POST',body:{consent:true,kind:'subscription',return_path:'/#planos'}});if(r.url){location.href=r.url;return}alert(t('paid_ok'));location.reload()};
 });
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');TAB=b.dataset.t;render()});
 const step=el=>(el.firstElementChild?.offsetWidth||250)+16;

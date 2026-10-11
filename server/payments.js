@@ -34,8 +34,8 @@ async function setup(){
   console.log('Stripe (teste) pronto:',Object.keys(priceIds).length,'preços');
 }
 function lookupFor(kind,amount){if(kind==='subscription')return'wc_sub_3999';if(kind==='lesson')return'wc_lesson_499';return amount>5?'wc_course_1299':'wc_course_499'}
-async function createCheckout({user,kind,amount,promo,course_id,lesson_id,origin,returnPath}){
-  const meta={app:'worldcourses',user_id:String(user.id),kind,course_id:String(course_id||''),lesson_id:String(lesson_id||''),return_path:String(returnPath||'/').slice(0,400),promo_until:promo?String(Math.floor(promo/1000)):''};
+async function createCheckout({user,kind,amount,promo,course_id,lesson_id,origin,returnPath,consentAt}){
+  const meta={app:'worldcourses',consent_at:String(consentAt||''),user_id:String(user.id),kind,course_id:String(course_id||''),lesson_id:String(lesson_id||''),return_path:String(returnPath||'/').slice(0,400),promo_until:promo?String(Math.floor(promo/1000)):''};
   const coupon=kind==='subscription'&&promo?await ensureCoupon(promo):null;
   const s=await stripe.checkout.sessions.create({
     mode:kind==='subscription'?'subscription':'payment',
@@ -52,14 +52,14 @@ const exists=ref=>!!db.get('SELECT id FROM payments WHERE provider_ref=?',[ref])
 // Registo idempotente nas tabelas de receita (payments), usadas pelo cálculo de pagamentos a criadores
 function recordOneTime(s){
   if(s.payment_status!=='paid'||exists(s.id))return false;const m=s.metadata||{};
-  db.run(`INSERT INTO payments(user_id,kind,course_id,lesson_id,amount,provider,provider_ref,status) VALUES(?,?,?,?,?,?,?,?)`,
-    [+m.user_id,m.kind,m.course_id?+m.course_id:null,m.lesson_id?+m.lesson_id:null,s.amount_total/100,'stripe_test',s.id,'paid']);return true}
+  db.run(`INSERT INTO payments(user_id,kind,course_id,lesson_id,amount,provider,provider_ref,status,stripe_customer,consent_at) VALUES(?,?,?,?,?,?,?,?,?,?)`,
+    [+m.user_id,m.kind,m.course_id?+m.course_id:null,m.lesson_id?+m.lesson_id:null,s.amount_total/100,'stripe_test',s.id,'paid',typeof s.customer==='string'?s.customer:(s.customer&&s.customer.id)||null,m.consent_at||null]);return true}
 function recordInvoice(inv,sub,meta){
   if(inv.status!=='paid'||exists(inv.id))return false;const m=meta||(sub&&sub.metadata)||{};if(!m.user_id)return false;
   const line=inv.lines&&inv.lines.data&&inv.lines.data[0],per=(line&&line.period)||{start:inv.period_start,end:inv.period_end};
   const disc=(inv.total_discount_amounts||[]).some(d=>d.amount>0)||(inv.discounts||[]).length>0;
-  db.run(`INSERT INTO payments(user_id,kind,amount,provider,provider_ref,status,starts_at,ends_at,stripe_sub,promo) VALUES(?,?,?,?,?,?,?,?,?,?)`,
-    [+m.user_id,'subscription',inv.amount_paid/100,'stripe_test',inv.id,'paid',iso(per.start),iso(per.end),(typeof inv.subscription==='string'?inv.subscription:null)||(inv.parent&&inv.parent.subscription_details&&inv.parent.subscription_details.subscription)||(sub&&sub.id)||null,disc?'launch_window':null]);return true}
+  db.run(`INSERT INTO payments(user_id,kind,amount,provider,provider_ref,status,starts_at,ends_at,stripe_sub,promo,stripe_customer,consent_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
+    [+m.user_id,'subscription',inv.amount_paid/100,'stripe_test',inv.id,'paid',iso(per.start),iso(per.end),(typeof inv.subscription==='string'?inv.subscription:null)||(inv.parent&&inv.parent.subscription_details&&inv.parent.subscription_details.subscription)||(sub&&sub.id)||null,disc?'launch_window':null,typeof inv.customer==='string'?inv.customer:(inv.customer&&inv.customer.id)||null,m.consent_at||null]);return true}
 async function fulfillSession(sessionId){
   const s=await stripe.checkout.sessions.retrieve(sessionId,{expand:['invoice','subscription']});
   if(s.livemode||(s.metadata||{}).app!=='worldcourses')return{ok:false};
@@ -77,9 +77,30 @@ async function handleWebhook(raw,sig){
   if(ev.type==='checkout.session.completed'||ev.type==='checkout.session.async_payment_succeeded')await fulfillSession(o.id);
   else if(ev.type==='invoice.paid'||ev.type==='invoice.payment_succeeded'){const subId=o.subscription||(o.parent&&o.parent.subscription_details&&o.parent.subscription_details.subscription);
     if(subId){const sub=await stripe.subscriptions.retrieve(subId);if((sub.metadata||{}).app==='worldcourses')recordInvoice({...o,subscription:subId},sub,sub.metadata)}}
-  else if(ev.type==='customer.subscription.deleted'){db.run(`UPDATE payments SET ends_at=MIN(ends_at,datetime('now')) WHERE stripe_sub=?`,[o.id])}
+  else if(ev.type==='customer.subscription.updated'){db.run(`UPDATE payments SET canceled_at=? WHERE stripe_sub=?`,[o.cancel_at_period_end||o.cancel_at?iso(o.canceled_at||Math.floor(Date.now()/1000)):null,o.id])}
+  else if(ev.type==='customer.subscription.deleted'){db.run(`UPDATE payments SET canceled_at=COALESCE(canceled_at,datetime('now')) WHERE stripe_sub=?`,[o.id]);db.run(`UPDATE payments SET ends_at=MIN(ends_at,datetime('now')) WHERE stripe_sub=?`,[o.id])}
   return ev.type;
 }
+// Stripe Customer Portal (teste): configuração própria criada uma vez (cancelamento no fim do período, faturas, cartão)
+let portalCfg=null;
+async function ensurePortalConfig(){if(portalCfg)return portalCfg;
+  for await(const c of stripe.billingPortal.configurations.list({active:true,limit:100}))if((c.metadata||{}).app==='worldcourses'){return portalCfg=c.id}
+  const c=await stripe.billingPortal.configurations.create({metadata:{app:'worldcourses'},
+    business_profile:{headline:'The World Courses — All Access'},
+    features:{subscription_cancel:{enabled:true,mode:'at_period_end',cancellation_reason:{enabled:true,options:['too_expensive','missing_features','unused','other']}},
+      payment_method_update:{enabled:true},invoice_history:{enabled:true},customer_update:{enabled:false}}},{idempotencyKey:'wc-portal-cfg-v1'});
+  return portalCfg=c.id}
+async function customerFor(userId){
+  const p=db.get(`SELECT stripe_customer FROM payments WHERE user_id=? AND stripe_customer IS NOT NULL ORDER BY id DESC LIMIT 1`,[userId]);if(p)return p.stripe_customer;
+  const q=db.get(`SELECT stripe_sub FROM payments WHERE user_id=? AND stripe_sub IS NOT NULL ORDER BY id DESC LIMIT 1`,[userId]);if(!q)return null;
+  const sub=await stripe.subscriptions.retrieve(q.stripe_sub);const cus=typeof sub.customer==='string'?sub.customer:sub.customer.id;
+  db.run('UPDATE payments SET stripe_customer=? WHERE stripe_sub=?',[cus,q.stripe_sub]);return cus}
+async function portalSession(userId,returnUrl){const customer=await customerFor(userId);if(!customer)return null;
+  const s=await stripe.billingPortal.sessions.create({customer,return_url:returnUrl,configuration:await ensurePortalConfig()});return s.url}
+async function subStatus(subId){try{const s=await stripe.subscriptions.retrieve(subId);
+  if(s.cancel_at_period_end||s.cancel_at||s.status==='canceled')db.run(`UPDATE payments SET canceled_at=COALESCE(canceled_at,datetime('now')) WHERE stripe_sub=?`,[subId]);
+  else db.run('UPDATE payments SET canceled_at=NULL WHERE stripe_sub=?',[subId]);
+  return{status:s.status,cancel_at_period_end:!!(s.cancel_at_period_end||s.cancel_at),current_period_end:s.current_period_end||(s.items&&s.items.data[0]&&s.items.data[0].current_period_end)||null}}catch(e){return null}}
 // Agenda a passagem para €39,99 no fim da janela (fase 2 sem desconto); idempotente
 async function scheduleLaunchEnd(sub,meta){
   const until=+((meta||{}).promo_until||0);if(!until||!sub||until*1000<=Date.now())return;
@@ -102,4 +123,4 @@ function startPromoJob(getEnd){if(!stripe)return;const run=async()=>{try{const e
 async function charge({kind,amount}){ // modo mock
   return{provider:'mock',ref:'mock_'+kind+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),status:'paid',amount};
 }
-module.exports={PROMO,startPromoJob,PRICES,MODE,setup,createCheckout,fulfillSession,handleWebhook,charge,stripe:()=>stripe};
+module.exports={portalSession,subStatus,PROMO,startPromoJob,PRICES,MODE,setup,createCheckout,fulfillSession,handleWebhook,charge,stripe:()=>stripe};
