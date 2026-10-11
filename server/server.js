@@ -26,9 +26,9 @@ function canWatch(u,lesson,course){
 }
 function courseOut(c,lang){const t=JSON.parse(c.i18n),x=t[lang]||t.pt;
   const st=db.get('SELECT COUNT(*) n,SUM(duration_sec) d FROM lessons WHERE course_id=?',[c.id]);
-  const r=db.get('SELECT COUNT(*) n,AVG(pct) p FROM views WHERE course_id=?',[c.id]);
+  const r=db.get('SELECT COUNT(*) n FROM views WHERE course_id=?',[c.id]),rv=db.get('SELECT COUNT(*) n,AVG(rating) a FROM reviews WHERE course_id=?',[c.id]);
   const lg=db.get(`SELECT COUNT(DISTINCT CASE WHEN spoken_language NOT IN('none') THEN spoken_language END) n,MAX(has_captions) cc FROM lessons WHERE course_id=?`,[c.id]);
-  return{spoken_language:c.spoken_language||null,mixed_languages:lg.n>1,captions:!!lg.cc,id:c.id,title:x.title,subtitle:x.subtitle,description:x.description,category:c.category,image:c.image,price:c.price,is_free:!!c.is_free,badge:c.is_free?'FREE':c.badge,source:c.source,creator:c.creator_name,creator_id:c.creator_id,lessons:st.n,duration_sec:st.d||0,views:r.n,rating:Math.min(5,4.3+((r.p||0.5)*0.7)).toFixed(1),published:!!c.published}}
+  return{spoken_language:c.spoken_language||null,mixed_languages:lg.n>1,captions:!!lg.cc,id:c.id,title:x.title,subtitle:x.subtitle,description:x.description,category:c.category,image:c.image,price:c.price,is_free:!!c.is_free,badge:c.is_free?'FREE':c.badge,source:c.source,creator:c.creator_name,creator_id:c.creator_id,lessons:st.n,duration_sec:st.d||0,views:r.n,rating:rv.n?rv.a.toFixed(1):null,review_count:rv.n,published:!!c.published}}
 const SPOKEN=['pt','en','fr','es','de','it'],SPOKEN_L=[...SPOKEN,'none'];
 const COURSE_SQL='SELECT c.*,u.name creator_name FROM courses c JOIN users u ON u.id=c.creator_id';
 
@@ -66,6 +66,24 @@ app.post('/api/views',need(),(req,res)=>{const{lesson_id,view_id,seconds}=req.bo
   const secs=Math.max(0,Math.min(Number(seconds)||0,l.duration_sec)),pct=secs/l.duration_sec;
   if(view_id){const v=db.get('SELECT * FROM views WHERE id=? AND user_id=?',[+view_id,req.user.id]);if(v){db.run(`UPDATE views SET seconds=MAX(seconds,?),pct=MAX(pct,?),updated_at=CURRENT_TIMESTAMP WHERE id=?`,[secs,pct,v.id]);return res.json({view_id:v.id})}}
   const id=db.run('INSERT INTO views(user_id,lesson_id,course_id,creator_id,seconds,pct) VALUES(?,?,?,?,?,?)',[req.user.id,l.id,c.id,c.creator_id,secs,pct]);res.json({view_id:id})});
+
+// ---- números reais e avaliações verificadas
+app.get('/api/stats',(req,res)=>res.json(db.get(`SELECT (SELECT COUNT(*) FROM courses WHERE published=1) courses,(SELECT COUNT(DISTINCT category) FROM courses WHERE published=1) categories,(SELECT COUNT(*) FROM courses WHERE published=1 AND is_free=1) free_courses,(SELECT COUNT(*) FROM lessons l JOIN courses c ON c.id=l.course_id WHERE c.published=1) lessons,(SELECT COUNT(*) FROM users WHERE role='creator') creators`)));
+// elegível: viu ≥10% de alguma aula do curso, ou comprou o curso/uma aula dele; nunca o próprio criador
+function reviewEligibility(u,c){if(!u)return'login';if(u.id===c.creator_id)return'own';
+  const s=db.settings();
+  if(db.get('SELECT id FROM views WHERE user_id=? AND course_id=? AND pct>=?',[u.id,c.id,s.min_pct]))return'ok';
+  if(db.get(`SELECT id FROM payments WHERE user_id=? AND course_id=? AND status='paid' AND kind IN('course','lesson')`,[u.id,c.id]))return'ok';
+  return'need'}
+app.get('/api/courses/:id/reviews',(req,res)=>{const c=db.get('SELECT * FROM courses WHERE id=?',[+req.params.id]);if(!c)return res.status(404).end();const u=me(req);
+  const items=db.all('SELECT r.rating,r.comment,r.updated_at,u.name FROM reviews r JOIN users u ON u.id=r.user_id WHERE r.course_id=? ORDER BY r.updated_at DESC LIMIT 50',[c.id]);
+  const agg=db.get('SELECT COUNT(*) n,AVG(rating) a FROM reviews WHERE course_id=?',[c.id]);
+  res.json({count:agg.n,avg:agg.n?Math.round(agg.a*10)/10:null,items:items.map(i=>({...i,name:i.name.split(' ')[0]+(i.name.includes(' ')?' '+i.name.split(' ').slice(-1)[0][0]+'.':'')})),eligibility:reviewEligibility(u,c),mine:u?db.get('SELECT rating,comment FROM reviews WHERE user_id=? AND course_id=?',[u.id,c.id])||null:null})});
+app.post('/api/courses/:id/reviews',need(),(req,res)=>{const c=db.get('SELECT * FROM courses WHERE id=?',[+req.params.id]);if(!c)return res.status(404).end();
+  const e=reviewEligibility(req.user,c);if(e!=='ok')return res.status(403).json({error:e});
+  const rating=Math.round(Number(req.body.rating));if(!(rating>=1&&rating<=5))return res.status(400).json({error:'invalid'});
+  const comment=String(req.body.comment||'').trim().slice(0,1000);
+  db.run(`INSERT INTO reviews(user_id,course_id,rating,comment) VALUES(?,?,?,?) ON CONFLICT(user_id,course_id) DO UPDATE SET rating=excluded.rating,comment=excluded.comment,updated_at=CURRENT_TIMESTAMP`,[req.user.id,c.id,rating,comment]);res.json({ok:true})});
 
 // ---- checkout (MOCK / TESTE)
 // Promo de lançamento: €29,99/mês para TODAS as subscrições desde LAUNCH_DATE até LAUNCH_DATE + promo_months; depois €39,99

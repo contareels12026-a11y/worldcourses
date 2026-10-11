@@ -32,7 +32,7 @@ function renderChrome(){
 <div class="auth" id="authBox"></div>
 <button class="burger" id="burger" aria-label="Menu">☰</button></div></header>`;
   const f=document.getElementById('chrome-foot');if(f)f.innerHTML=`
-<section class="trust"><div class="wrap"><div><i>🏆</i><b>98%</b><span data-i18n="t1"></span></div><div><i>👥</i><b>2M+</b><span data-i18n="t2"></span></div><div><i>🌐</i><b>190+</b><span data-i18n="t3"></span></div><div><i>🛡️</i><b data-i18n="t4a"></b><span data-i18n="t4"></span></div><div><i>🎧</i><b data-i18n="t5a"></b><span data-i18n="t5"></span></div></div></section>
+<section class="trust"><div class="wrap"><div><i>📚</i><b data-stat="courses">–</b><span data-i18n="st_courses"></span></div><div><i>🗂️</i><b data-stat="categories">–</b><span data-i18n="st_categories"></span></div><div><i>🎁</i><b data-stat="free_courses">–</b><span data-i18n="tr_free"></span></div><div><i>🧪</i><b data-i18n="tr_test_t"></b><span data-i18n="tr_test"></span></div><div><i>⭐</i><b data-i18n="tr_rev_t"></b><span data-i18n="tr_rev"></span></div></div></section>
 <footer id="footer"><div class="wrap foot">${LOGO}
 <div><h4 data-i18n="f_platform"></h4><a href="/#cat" data-i18n="nav_categories"></a><a href="/#cursos" data-i18n="nav_courses"></a><a href="/creator.html" data-i18n="nav_creators"></a><a href="/#planos" data-i18n="nav_plans"></a></div>
 <div><h4 data-i18n="f_company"></h4><a data-i18n="nav_about"></a><a data-i18n="blog"></a><a data-i18n="careers"></a><a data-i18n="contacts"></a></div>
@@ -40,7 +40,7 @@ function renderChrome(){
 <div><h4 data-i18n="f_follow"></h4><div class="socials"><a aria-label="Instagram">◎</a><a aria-label="YouTube">▶</a><a aria-label="LinkedIn">in</a><a aria-label="X">𝕏</a><a aria-label="Facebook">f</a><a aria-label="TikTok">♪</a></div></div>
 <div><h4 data-i18n="f_news"></h4><form class="news" id="newsForm"><input type="email" required data-i18n-ph="email_ph"><button>→</button></form></div></div>
 <div class="wrap copy"><span data-i18n="rights"></span><span>Learn. Grow. Explore. Anywhere. <a href="#" class="up">↑</a></span></div></footer>`;
-  applyI18n();renderAuth();
+  applyI18n();renderAuth();loadStats();
   const sel=document.getElementById('langSel');sel&&(sel.onchange=()=>{localStorage.setItem('wc-lang',sel.value);const u=new URL(location);u.searchParams.delete('lang');location.href=u});
   const root=document.documentElement;
   document.getElementById('toLight')?.addEventListener('click',()=>{root.dataset.theme='light';localStorage.setItem('wc-theme','light')});
@@ -50,6 +50,7 @@ function renderChrome(){
   document.getElementById('newsForm')?.addEventListener('submit',e=>{e.preventDefault();e.target.reset();alert(t('news_ok'))});
   document.getElementById('searchForm')?.addEventListener('submit',e=>{e.preventDefault();location.href='/?q='+encodeURIComponent(document.getElementById('searchInput').value)+'#cursos'});
 }
+async function loadStats(){if(!document.querySelector('[data-stat]'))return;try{const s=await api('/api/stats');document.querySelectorAll('[data-stat]').forEach(e=>e.textContent=s[e.dataset.stat])}catch{}}
 function renderAuth(){const html=ME?`${ME.role==='creator'?`<a href="/creator.html" class="entrar" data-i18n="dashboard"></a>`:''}${ME.role==='admin'?`<a href="/admin.html" class="entrar" data-i18n="admin"></a>`:''}<span class="who">👤 ${esc(ME.name)}${ME.subscription_until?' <em class="pill">ALL ACCESS</em>':''}</span><a href="#" class="btn ghost sm" id="logoutBtn" data-i18n="logout"></a>`
   :`<a href="/login.html" class="entrar" data-i18n="login"></a><a href="/login.html?mode=signup" class="btn gold sm" data-i18n="signup"></a>`;
   for(const id of['authBox','authMobile']){const el=document.getElementById(id);if(el){el.innerHTML=html;applyI18n(el)}}

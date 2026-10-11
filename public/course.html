@@ -13,17 +13,23 @@ async function load(){if(!PR)try{PR=await api('/api/pricing')}catch{}C=await api
  const m=document.getElementById('course');
  m.innerHTML=`<a href="/#cursos" class="link">← ${t('back')}</a>
  <div class="course-head"><div><span class="badge-inline ${C.is_free?'free':''}">${esc(C.badge)}</span><span class="langs-inline">${langBadge(C.spoken_language)}${C.mixed_languages?`<span class="lang-dot">🌐 ${t('mixed_langs')}</span>`:''}${C.captions?ccBadge():''}</span><h1>${esc(C.title)}</h1><p class="lead2">${esc(C.description)}</p>
- <p class="muted">${t('by')} <b>${esc(C.creator)}</b> · ${C.lessons.length} ${t('lessons')} · ${fmtDur(C.duration_sec)} · ★ ${C.rating}</p>
+ <p class="muted">${t('by')} <b>${esc(C.creator)}</b> · ${C.lessons.length} ${t('lessons')} · ${fmtDur(C.duration_sec)} · ${C.review_count?`★ ${C.rating} (${C.review_count})`:t('no_reviews')}</p>
  ${C.owned?`<p class="ok">✓ ${t('owned')}</p>`:''}${C.subscribed?`<p class="ok">✓ ALL ACCESS — ${t('sub_active')} ${(ME.subscription_until||'').slice(0,10)}</p>`:''}</div>
  ${!C.is_free&&!C.owned&&!C.subscribed?`<div class="buybox"><b class="big">${eur(C.price)}</b><button class="btn gold block" data-buy="course">${t('buy_course')}</button><button class="btn outline block" data-buy="subscription">${t('subscribe')} · ${PR&&PR.promo?`<s>${eur(PR.subscription)}</s> ${eur(PR.promo.price)}`:eur(PR?PR.subscription:39.99)}</button>${PR&&PR.promo?`<p class="tiny promo-line">${t('promo_line').replace('{d}',fmtDate(PR.promo.until))}</p>`:''}<p class="tiny">${t('test_mode')}</p></div>`:''}</div>
  <div class="course-grid"><div><div class="player" id="playerBox"><div class="placeholder"><img src="/${esc(C.image)}" alt=""><p>${t('select_lesson')}</p></div></div><p class="tiny" id="trackNote"></p></div>
  <aside class="lessons"><h3>${t('course_content')}</h3>${C.lessons.map(l=>`<button class="lesson ${l.unlocked?'':'lock'}" data-l="${l.id}"><span>${l.position}. ${esc(l.title)}</span><small>${l.spoken_language&&l.spoken_language!==C.spoken_language?langBadge(l.spoken_language,'sm')+' ':''}${l.has_captions?'<span class="cc-mini">CC</span> ':''}${fmtDur(l.duration_sec)} · ${l.free_preview?'<em class="pv">'+t('free_preview')+'</em>':l.unlocked?'▶':'🔒 '+t('locked')}</small></button>`).join('')}
- <h4>${t('sources')}</h4><p class="tiny">${esc(C.source)}</p></aside></div>`;
+ <h4>${t('sources')}</h4><p class="tiny">${esc(C.source)}</p></aside></div><section class="reviews" id="reviews"></section>`;loadReviews();
  m.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>play(+b.dataset.l));
  m.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(b.dataset.buy));
  const first=C.lessons.find(l=>!l.unlocked);const want=+new URLSearchParams(location.search).get('lesson');
  if(want)play(want);else if(first&&new URLSearchParams(location.search).get('paywall'))play(first.id);
 }
+async function loadReviews(){const R=await api('/api/courses/'+id+'/reviews'),el=document.getElementById('reviews');
+ const stars=n=>'★★★★★'.slice(0,n)+'<span class="off">'+'★★★★★'.slice(n)+'</span>';
+ let form='';if(R.eligibility==='ok')form=`<form id="rvForm" class="panel rv-form"><h3>${t(R.mine?'update_review':'write_review')}</h3><div class="star-pick">${[5,4,3,2,1].map(n=>`<label><input type="radio" name="rating" value="${n}" ${R.mine&&R.mine.rating===n?'checked':''} required><span>★</span></label>`).join('')}</div><textarea name="comment" rows="3" maxlength="1000" placeholder="${t('comment')}">${esc(R.mine?R.mine.comment:'')}</textarea><button class="btn gold sm">${t('send')}</button></form>`;
+ else form=`<p class="tiny">${t({login:'review_login',need:'review_need',own:'review_own'}[R.eligibility])}</p>`;
+ el.innerHTML=`<h2>${t('reviews')} ${R.count?`<span class="rv-avg">★ ${R.avg} · ${R.count}</span>`:''}</h2>${R.count?R.items.map(i=>`<div class="rv"><div class="rv-stars">${stars(i.rating)}</div><p>${esc(i.comment)}</p><small>${esc(i.name)} · ✓ ${t('verified')} · ${i.updated_at.slice(0,10)}</small></div>`).join(''):`<div class="empty">⭐ ${t('no_reviews')}</div>`}${form}`;
+ const f=document.getElementById('rvForm');if(f)f.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));await api('/api/courses/'+id+'/reviews',{method:'POST',body:d});alert(t('review_ok'));load()}}
 async function buy(kind,lesson_id){if(!ME){location.href='/login.html?next='+encodeURIComponent(location.pathname+location.search);return}
  const amount=kind==='subscription'?39.99:kind==='lesson'?4.99:C.price;
  if(!confirm(`${t('confirm_pay')} ${eur(amount)}?\n${t('test_mode')}`))return;

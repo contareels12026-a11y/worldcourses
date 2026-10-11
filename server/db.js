@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS courses(id INTEGER PRIMARY KEY,creator_id INTEGER NOT
 CREATE TABLE IF NOT EXISTS lessons(id INTEGER PRIMARY KEY,course_id INTEGER NOT NULL,position INTEGER NOT NULL,i18n TEXT NOT NULL,youtube_id TEXT,video_url TEXT,start_sec INTEGER DEFAULT 0,duration_sec INTEGER NOT NULL,free_preview INTEGER DEFAULT 0);
 CREATE TABLE IF NOT EXISTS payments(id INTEGER PRIMARY KEY,user_id INTEGER NOT NULL,kind TEXT NOT NULL CHECK(kind IN('lesson','course','subscription')),course_id INTEGER,lesson_id INTEGER,amount REAL NOT NULL,provider TEXT NOT NULL,provider_ref TEXT,status TEXT NOT NULL,starts_at TEXT,ends_at TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS views(id INTEGER PRIMARY KEY,user_id INTEGER NOT NULL,lesson_id INTEGER NOT NULL,course_id INTEGER NOT NULL,creator_id INTEGER NOT NULL,seconds REAL DEFAULT 0,pct REAL DEFAULT 0,created_at TEXT DEFAULT CURRENT_TIMESTAMP,updated_at TEXT DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS reviews(id INTEGER PRIMARY KEY,user_id INTEGER NOT NULL,course_id INTEGER NOT NULL,rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),comment TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP,updated_at TEXT DEFAULT CURRENT_TIMESTAMP,UNIQUE(user_id,course_id));
 CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY,value TEXT NOT NULL);
 `;
 const DEFAULTS={launch_date:'2026-10-09',feedback_months:'6',promo_enabled:'1',promo_months:'3',platform_share:'0.30',w_complete:'1.0',complete_threshold:'0.90',min_pct:'0.10',partial_factor:'1.0'};
