@@ -57,7 +57,39 @@ ${LANGS.map(l=>`<link rel="alternate" hreflang="${l}" href="${url(l)}">`).join('
   html0=prerender(html0,i);
   const html=html0.replace(/<title>.*?<\/title>/,head).replace('<html lang="pt"',`<html lang="${lang==='pt'?'pt-PT':lang}"`);
   res.set('Cache-Control','no-cache').type('html').send(html)}}
+// ---- blog (artigos em PT; ficheiros em public/content/blog)
+const BLOG_DIR=path.join(PUB,'content','blog');
+const posts=()=>JSON.parse(fs.readFileSync(path.join(BLOG_DIR,'posts.json'),'utf8'));
+const fmtD=d=>new Date(d+'T00:00:00Z').toLocaleDateString('pt-PT',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});
+function blogPage(req,res,next){
+  const all=posts(),slug=req.params.slug;let post=null;
+  if(slug){post=all.find(p=>p.slug===slug);if(!post)return next()}
+  const pathQ=slug?`/blog/${slug}`:'/blog',canon=BASE+pathQ;
+  const title=post?`${post.title} — The World Courses`:'Blog — Guias sobre aprender online e criar cursos | The World Courses';
+  const desc=clip(post?post.desc:'Artigos práticos e honestos sobre aprender online, inteligência artificial, criação de conteúdo e criar cursos online.');
+  const img=BASE+'/assets/og.jpg';
+  let main,extra;
+  if(post){
+    const body=fs.readFileSync(path.join(BLOG_DIR,post.slug+'.html'),'utf8');
+    const others=all.filter(p=>p.slug!==post.slug);
+    main=`<nav class="info-nav"><a href="/blog">← Blog</a></nav><article class="legal blog-post"><h1>${esc(post.title)}</h1><p class="muted"><time datetime="${post.date}">${fmtD(post.date)}</time> · The World Courses</p>${body}
+<hr><h2>Outros artigos</h2><ul>${others.map(o=>`<li><a href="/blog/${o.slug}">${esc(o.title)}</a></li>`).join('')}</ul></article>`;
+    extra=ld({'@context':'https://schema.org','@type':'BlogPosting',headline:post.title,description:post.desc,datePublished:post.date,dateModified:post.date,inLanguage:'pt-PT',mainEntityOfPage:canon,image:img,author:{'@type':'Organization',name:'The World Courses',url:BASE+'/'},publisher:{'@type':'Organization',name:'The World Courses',logo:{'@type':'ImageObject',url:BASE+'/favicon.svg'}}});
+  }else{
+    main=`<article class="legal blog-index"><h1>Blog</h1><p class="lead2">Guias práticos sobre aprender online, inteligência artificial, criação de conteúdo e criar cursos.</p>
+${all.map(p=>`<section class="blog-card"><h2><a href="/blog/${p.slug}">${esc(p.title)}</a></h2><p class="muted"><time datetime="${p.date}">${fmtD(p.date)}</time></p><p>${esc(p.desc)}</p><a href="/blog/${p.slug}" class="link">Ler artigo →</a></section>`).join('')}</article>`;
+    extra=ld({'@context':'https://schema.org','@type':'Blog',name:'Blog The World Courses',url:canon,inLanguage:'pt-PT',blogPost:all.map(p=>({'@type':'BlogPosting',headline:p.title,url:BASE+'/blog/'+p.slug,datePublished:p.date}))});
+  }
+  const head=`<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}">
+<link rel="canonical" href="${canon}"><link rel="alternate" hreflang="pt" href="${canon}">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="32x32"><meta name="theme-color" content="#07090f">
+<meta property="og:type" content="${post?'article':'website'}"><meta property="og:site_name" content="The World Courses"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${canon}"><meta property="og:image" content="${img}"><meta property="og:image:alt" content="The World Courses"><meta property="og:locale" content="pt_PT">${post?`<meta property="article:published_time" content="${post.date}">`:''}
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${img}">${extra}`;
+  const html=prerender(file('blog.html'),0).replace(/<title>.*?<\/title>/,head).replace('<html lang="pt"','<html lang="pt-PT"').replace('<!--BLOG-->',()=>main);
+  res.set('Cache-Control','no-cache').type('html').send(html)}
 function mount(app){
+  app.get(['/blog','/blog/'],blogPage);app.get('/blog/:slug',blogPage);
   app.get(['/','/index.html'],page('home','index.html'));
   app.get('/course.html',page('course','course.html'));
   app.get('/login.html',page('login','login.html'));
@@ -68,7 +100,8 @@ function mount(app){
   app.get('/robots.txt',(req,res)=>res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin.html\nDisallow: /creator.html\nDisallow: /account.html\n\nSitemap: ${BASE}/sitemap.xml\n`));
   app.get('/sitemap.xml',(req,res)=>{const paths=['/','/login.html',...INFO.map(p=>`/info.html?p=${p}`),...db.all('SELECT id FROM courses WHERE published=1 ORDER BY id').map(c=>`/course.html?id=${c.id}`)];
     const u=(p,l)=>esc(BASE+p+(p.includes('?')?'&':'?')+'lang='+l);
+    const blogUrls=['/blog',...posts().map(p=>'/blog/'+p.slug)].map(p=>`<url><loc>${esc(BASE+p)}</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`).join('\n');
     res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n`+
-      paths.flatMap(p=>LANGS.map(l=>`<url><loc>${u(p,l)}</loc>${LANGS.map(a=>`<xhtml:link rel="alternate" hreflang="${a}" href="${u(p,a)}"/>`).join('')}<changefreq>weekly</changefreq><priority>${p==='/'?'1.0':'0.7'}</priority></url>`)).join('\n')+'\n</urlset>\n')});
+      paths.flatMap(p=>LANGS.map(l=>`<url><loc>${u(p,l)}</loc>${LANGS.map(a=>`<xhtml:link rel="alternate" hreflang="${a}" href="${u(p,a)}"/>`).join('')}<changefreq>weekly</changefreq><priority>${p==='/'?'1.0':'0.7'}</priority></url>`)).join('\n')+'\n'+blogUrls+'\n</urlset>\n')});
 }
 module.exports={mount};

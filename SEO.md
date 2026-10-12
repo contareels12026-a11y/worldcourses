@@ -38,3 +38,9 @@ The marketing copy, prices and stats are unchanged. No reviews or numbers were i
 9. Test link previews (Facebook Sharing Debugger, LinkedIn Post Inspector, X) and the Rich Results Test for Course JSON-LD.
 10. Email: SMTP for receipts (Gmail app password) or email on the domain.
 11. Test a small real purchase after Stripe goes live; confirm the payout to Revolut.
+
+## Blog (branch `blog`)
+- `/blog` and `/blog/<slug>`, rendered on the server by `server/seo.js` from `public/content/blog/posts.json` + `<slug>.html` (PT only, so hreflang pt only).
+- Each page has its own title, description, canonical, OG/Twitter tags and BlogPosting/Blog JSON-LD. Blog URLs are in sitemap.xml.
+- Linked from the footer (Company column), a blog section on the home page, and from inside the articles to categories and courses. Unknown slugs return 404.
+- To add a post: add an entry to posts.json and write `<slug>.html` (body only, h2 and below).
