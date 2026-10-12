@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=11"><link rel="stylesheet" href="/platform.css?v=11">
-<script src="/i18n.js?v=11"></script><script src="/app.js?v=11"></script><title>Curso — The World Courses</title></head><body data-page="course">
+<link rel="stylesheet" href="/styles.css?v=12"><link rel="stylesheet" href="/platform.css?v=12">
+<script src="/i18n.js?v=12"></script><script src="/app.js?v=12"></script><title>Curso — The World Courses</title></head><body data-page="course">
 <div id="chrome-top"></div>
 <main class="wrap page" id="course"><p class="muted">…</p></main>
 <div id="chrome-foot"></div>
@@ -11,14 +11,14 @@ let PR=null,FB_ASKED=false,C,player,cur=null,viewId=null,acc=0,lastT=null,hb;
 const id=+new URLSearchParams(location.search).get('id');
 async function load(){if(!PR)try{PR=await api('/api/pricing')}catch{}C=await api('/api/courses/'+id+'?lang='+LANG);document.title=C.title+' — The World Courses';
  const m=document.getElementById('course');
- m.innerHTML=`<a href="/#cursos" class="link">← ${t('back')}</a>
+ m.innerHTML=`<a href="/#cursos" class="link">← ${t('back')}</a> · <a href="/?cat=${encodeURIComponent(C.category)}#cursos" class="link">${t('c_'+C.category).replace(/<br>/g,' ')}</a> · <a href="/info.html?p=faq" class="link">${t('faq')}</a>
  <div class="course-head"><div><span class="badge-inline ${C.is_free?'free':''}">${esc(C.badge)}</span><span class="langs-inline">${langBadge(C.spoken_language)}${C.mixed_languages?`<span class="lang-dot">🌐 ${t('mixed_langs')}</span>`:''}${C.captions?ccBadge():''}</span><h1>${esc(C.title)}</h1><p class="lead2">${esc(C.description)}</p>
  <p class="muted">${t('by')} <b>${esc(C.creator)}</b> · ${C.lessons.length} ${t('lessons')} · ${fmtDur(C.duration_sec)} · ${C.review_count?`★ ${C.rating} (${C.review_count})`:t('no_reviews')}</p>
  ${C.owned?`<p class="ok">✓ ${t('owned')}</p>`:''}${C.subscribed?`<p class="ok">✓ ALL ACCESS — ${t('sub_active')} ${(ME.subscription_until||'').slice(0,10)}</p>`:''}</div>
  ${!C.is_free&&!C.owned&&!C.subscribed?`<div class="buybox"><b class="big">${eur(C.price)}</b><button class="btn gold block" data-buy="course">${t('buy_course')}</button><button class="btn outline block" data-buy="subscription">${t('subscribe')} · ${PR&&PR.promo?`<s>${eur(PR.subscription)}</s> ${eur(PR.promo.price)}`:eur(PR?PR.subscription:39.99)}</button>${PR&&PR.promo?`<p class="tiny promo-line">${t('promo_line').replace('{d}',fmtDate(PR.promo.until))}</p>`:''}<p class="tiny">${t('test_mode')}</p></div>`:''}</div>
- <div class="course-grid"><div><div class="player" id="playerBox"><div class="placeholder"><img src="/${esc(C.image)}" alt=""><p>${t('select_lesson')}</p></div></div><p class="tiny" id="trackNote"></p></div>
- <aside class="lessons"><h3>${t('course_content')}</h3>${C.lessons.map(l=>`<button class="lesson ${l.unlocked?'':'lock'}" data-l="${l.id}"><span>${l.position}. ${esc(l.title)}</span><small>${l.spoken_language&&l.spoken_language!==C.spoken_language?langBadge(l.spoken_language,'sm')+' ':''}${l.has_captions?'<span class="cc-mini">CC</span> ':''}${fmtDur(l.duration_sec)} · ${l.free_preview?'<em class="pv">'+t('free_preview')+'</em>':l.unlocked?'▶':'🔒 '+t('locked')}</small></button>`).join('')}
- <h4>${t('sources')}</h4><p class="tiny">${esc(C.source)}</p></aside></div><section class="reviews" id="reviews"></section>`;loadReviews();
+ <div class="course-grid"><div><div class="player" id="playerBox"><div class="placeholder"><img src="/${esc(C.image)}" alt="${esc(C.title)}"><p>${t('select_lesson')}</p></div></div><p class="tiny" id="trackNote"></p></div>
+ <aside class="lessons"><h2>${t('course_content')}</h2>${C.lessons.map(l=>`<button class="lesson ${l.unlocked?'':'lock'}" data-l="${l.id}"><span>${l.position}. ${esc(l.title)}</span><small>${l.spoken_language&&l.spoken_language!==C.spoken_language?langBadge(l.spoken_language,'sm')+' ':''}${l.has_captions?'<span class="cc-mini">CC</span> ':''}${fmtDur(l.duration_sec)} · ${l.free_preview?'<em class="pv">'+t('free_preview')+'</em>':l.unlocked?'▶':'🔒 '+t('locked')}</small></button>`).join('')}
+ <h3>${t('sources')}</h3><p class="tiny">${esc(C.source)}</p></aside></div><section class="reviews" id="reviews"></section>`;loadReviews();
  m.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>play(+b.dataset.l));
  m.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buy(b.dataset.buy));
  const first=C.lessons.find(l=>!l.unlocked);const want=+new URLSearchParams(location.search).get('lesson');
@@ -53,7 +53,7 @@ async function play(lid){flush();document.querySelectorAll('.lesson').forEach(b=
   document.getElementById('trackNote').textContent=v.can_track?'':'—';
   if(ME&&ME.role==='admin'&&window.DEMO_TOOLS)document.getElementById('trackNote').innerHTML=`<button class="btn ghost sm" id="sim">${t('simulate')} (admin/demo)</button>`,document.getElementById('sim').onclick=async()=>{acc=cur.duration_sec;await flush(true);alert(t('tracking'))};
  }catch(e){if(e.status!==402)throw e;const d=e.data;
-  box.innerHTML=`<div class="paywall"><img src="/${esc(C.image)}" alt=""><div><h2>🔒 ${t('paywall_t')}</h2><p>${esc(L.title)}</p><p class="muted">${t('paywall_p')}</p>
+  box.innerHTML=`<div class="paywall"><img src="/${esc(C.image)}" alt="${esc(C.title)}"><div><h2>🔒 ${t('paywall_t')}</h2><p>${esc(L.title)}</p><p class="muted">${t('paywall_p')}</p>
   <div class="pw-btns"><button class="btn outline" data-k="lesson">${t('buy_lesson')} · ${eur(d.lesson_price)}</button><button class="btn gold" data-k="course">${t('buy_course')} · ${eur(d.course_price)}</button><button class="btn outline gold-b" data-k="subscription">${t('subscribe')} · ${eur(d.subscription)}</button></div>
   ${ME?'':`<p class="tiny">${t('login_to_buy')}</p>`}<p class="tiny">${t('test_mode')}</p></div></div>`;
   box.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>buy(b.dataset.k,b.dataset.k==='lesson'?lid:undefined))}}

@@ -88,7 +88,7 @@ blockquote{font-size:13px}cite{display:block;font-style:normal;color:var(--mut);
 .trust div{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}.trust i{grid-row:span 2;font-size:28px}
 .trust b{font-size:16px}.trust span{font-size:12px;color:var(--mut)}
 footer{padding-top:34px}.foot{display:grid;grid-template-columns:1.6fr repeat(3,1fr) 1.2fr 1.5fr;gap:24px}
-.foot h4{font-size:13px;margin-bottom:10px}.foot div>a{display:block;color:var(--mut);font-size:13px;padding:2px 0}.foot div>a:hover{color:var(--gold)}
+.foot h2,.foot h4{font-size:13px;margin-bottom:10px}.foot div>a{display:block;color:var(--mut);font-size:13px;padding:2px 0}.foot div>a:hover{color:var(--gold)}.foot div>a br{display:none}
 .foot .logo{align-items:flex-start}
 .socials{display:flex;gap:14px;font-size:18px;font-weight:700}.socials a:hover{color:var(--gold)}
 .news{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.news input{flex:1;min-width:0;background:var(--bg2);border:0;padding:11px;color:var(--tx)}

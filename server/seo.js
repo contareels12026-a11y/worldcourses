@@ -1,5 +1,5 @@
 // SEO: meta título/descrição por idioma, Open Graph, hreflang, canonical, robots.txt, sitemap.xml
-const fs=require('fs'),path=require('path'),db=require('./db');
+const fs=require('fs'),path=require('path'),vm=require('vm'),db=require('./db');
 const PUB=path.join(__dirname,'..','public');
 const BASE=(process.env.PUBLIC_URL||'https://worldcourses.onrender.com').replace(/\/$/,'');
 const LANGS=['pt','en','fr'],LOC={pt:'pt_PT',en:'en_GB',fr:'fr_FR'};
@@ -19,24 +19,42 @@ const M={
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cache={};const file=f=>cache[f]||(cache[f]=fs.readFileSync(path.join(PUB,f),'utf8'));
 const INFO=['faq','terms','privacy','refunds','creators'];
+// dicionário partilhado com o cliente (public/i18n.js) para pré-renderizar textos data-i18n no servidor
+let I18N={};try{const sb={window:{}};vm.runInNewContext(fs.readFileSync(path.join(PUB,'i18n.js'),'utf8'),sb);I18N=sb.window.I18N||{}}catch(e){console.error('seo i18n:',e.message)}
+const tr_=(k,i)=>I18N[k]?(I18N[k][i]??I18N[k][0]):null;
+const clip=(s,n=160)=>{s=String(s||'').replace(/\s+/g,' ').trim();return s.length>n?s.slice(0,n-1).replace(/\s+\S*$/,'')+'…':s};
+const CAT_KEY=c=>'c_'+c;
+const ld=o=>`<script type="application/ld+json">${JSON.stringify(o).replace(/</g,'\\u003c')}</script>`;
+// preenche elementos vazios com data-i18n (o cliente volta a aplicar o mesmo texto); bots veem h1/h2 reais
+function prerender(html,i){return html.replace(/(<(\w+)\b[^>]*\sdata-i18n="(\w+)"[^>]*>)(<\/\2>)/g,(m,open,tag,k,close)=>{const v=tr_(k,i);return v==null?m:open+v+close})}
 function page(name,file_){return(req,res,next)=>{
   const lang=LANGS.includes(req.query.lang)?req.query.lang:'pt',i=LANGS.indexOf(lang);
-  let body=null,title,desc,img=BASE+'/assets/og.jpg',noindex=false,pathQ=req.path==='/index.html'?'/':req.path;
+  let body=null,main=null,extra='',ogType='website',imgAlt='The World Courses',title,desc,img=BASE+'/assets/og.jpg',noindex=false,pathQ=req.path==='/index.html'?'/':req.path;
   if(name==='course'){const c=db.get('SELECT * FROM courses WHERE id=?',[+req.query.id||0]);if(!c)return next();
-    const x=JSON.parse(c.i18n);const tr=x[lang]||x.pt;title=`${tr.title} — The World Courses`;desc=tr.description||tr.subtitle;img=BASE+'/'+c.image;pathQ=`/course.html?id=${c.id}`}
+    const x=JSON.parse(c.i18n);const tr=x[lang]||x.pt;title=`${tr.title} — The World Courses`;desc=tr.description||tr.subtitle;img=BASE+'/'+c.image;imgAlt=tr.title;pathQ=`/course.html?id=${c.id}`;ogType='article';
+    const cat=(tr_(CAT_KEY(c.category),i)||c.category).replace(/<br>/g,' '),u=db.get('SELECT name FROM users WHERE id=?',[c.creator_id]);
+    main=`<a href="/#cursos" class="link">← ${esc(tr_('back',i)||'')}</a> · <a href="/?cat=${encodeURIComponent(c.category)}#cursos" class="link">${esc(cat)}</a>
+<div class="course-head"><div><h1>${esc(tr.title)}</h1><p class="lead2">${esc(tr.description||tr.subtitle||'')}</p>${u?`<p class="muted">${esc(tr_('by',i)||'')} <b>${esc(u.name)}</b></p>`:''}</div></div>
+<div class="course-grid"><div><div class="player"><div class="placeholder"><img src="/${esc(c.image)}" alt="${esc(tr.title)}" width="640" height="360"></div></div></div></div>`;
+    extra=ld({'@context':'https://schema.org','@type':'Course',name:tr.title,description:clip(desc,300),url:BASE+pathQ+'&lang='+lang,image:img,inLanguage:c.spoken_language||undefined,isAccessibleForFree:!!c.is_free,
+      provider:{'@type':'Organization',name:'The World Courses',url:BASE+'/'},...(u?{creator:{'@type':'Person',name:u.name}}:{})})}
   else if(name==='info'){const p=INFO.includes(req.query.p)?req.query.p:null;if(!p)return next();const m=M['info_'+p];title=m.t[i];desc=m.d[i];pathQ=`/info.html?p=${p}`;
     body=fs.readFileSync(path.join(PUB,'content',`${p}.${lang}.html`),'utf8')}
-  else{const m=M[name];title=m.t[i];desc=m.d[i];noindex=!!m.noindex}
+  else{const m=M[name];title=m.t[i];desc=m.d[i];noindex=!!m.noindex;
+    if(name==='home')extra=ld({'@context':'https://schema.org','@graph':[{'@type':'Organization','@id':BASE+'/#org',name:'The World Courses',url:BASE+'/',logo:BASE+'/favicon.svg'},{'@type':'WebSite',name:'The World Courses',url:BASE+'/',inLanguage:['pt-PT','en','fr'],publisher:{'@id':BASE+'/#org'},potentialAction:{'@type':'SearchAction',target:BASE+'/?q={search_term_string}#cursos','query-input':'required name=search_term_string'}}]})}
+  desc=clip(desc);
   const url=l=>BASE+pathQ+(pathQ.includes('?')?'&':'?')+'lang='+l;
   const head=`<title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">${noindex?'\n<meta name="robots" content="noindex">':''}
 <link rel="canonical" href="${url(lang)}">
 ${LANGS.map(l=>`<link rel="alternate" hreflang="${l}" href="${url(l)}">`).join('')}<link rel="alternate" hreflang="x-default" href="${url('pt')}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="32x32"><meta name="theme-color" content="#07090f">
-<meta property="og:type" content="website"><meta property="og:site_name" content="The World Courses"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
-<meta property="og:url" content="${url(lang)}"><meta property="og:image" content="${esc(img)}"><meta property="og:locale" content="${LOC[lang]}">${LANGS.filter(l=>l!==lang).map(l=>`<meta property="og:locale:alternate" content="${LOC[l]}">`).join('')}
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(img)}">`;
+<meta property="og:type" content="${ogType}"><meta property="og:site_name" content="The World Courses"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
+<meta property="og:url" content="${url(lang)}"><meta property="og:image" content="${esc(img)}"><meta property="og:image:alt" content="${esc(imgAlt)}"><meta property="og:locale" content="${LOC[lang]}">${LANGS.filter(l=>l!==lang).map(l=>`<meta property="og:locale:alternate" content="${LOC[l]}">`).join('')}
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(img)}"><meta name="twitter:image:alt" content="${esc(imgAlt)}">${extra}`;
   let html0=file(file_);if(body!==null)html0=html0.replace('<article id="infoBody" class="legal"></article>',()=>`<article id="infoBody" class="legal">${body}</article>`);
+  if(main!==null)html0=html0.replace('<main class="wrap page" id="course"><p class="muted">…</p></main>',()=>`<main class="wrap page" id="course">${main}</main>`);
+  html0=prerender(html0,i);
   const html=html0.replace(/<title>.*?<\/title>/,head).replace('<html lang="pt"',`<html lang="${lang==='pt'?'pt-PT':lang}"`);
   res.set('Cache-Control','no-cache').type('html').send(html)}}
 function mount(app){

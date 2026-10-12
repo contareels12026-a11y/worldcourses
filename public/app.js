@@ -25,7 +25,7 @@ function renderChrome(){
 <div class="topbar"><div class="wrap"><span data-i18n="topbar"></span><nav><a href="/info.html?p=faq" data-i18n="help"></a><a href="#footer" data-i18n="contacts"></a>
 <select id="langSel" class="lang" aria-label="Idioma / Language / Langue">${[['pt','🇵🇹 Português (PT)'],['en','🇬🇧 English'],['fr','🇫🇷 Français']].map(([v,l])=>`<option value="${v}" ${v===LANG?'selected':''}>${l}</option>`).join('')}</select></nav></div></div>
 <header class="header"><div class="wrap">${LOGO}
-<nav class="mainnav" id="mainnav"><a href="/#cat" data-i18n="nav_categories"></a><a href="/#cursos" data-i18n="nav_courses"></a><a href="/creator.html" data-i18n="nav_creators"></a><a href="/#planos" data-i18n="nav_plans"></a><a href="#footer" data-i18n="nav_about"></a>
+<nav class="mainnav" id="mainnav"><a href="/#cat" data-i18n="nav_categories"></a><a href="/#cursos" data-i18n="nav_courses"></a><a href="/#criador" data-i18n="nav_creators"></a><a href="/#planos" data-i18n="nav_plans"></a><a href="#footer" data-i18n="nav_about"></a>
 <div class="mobile-only" id="authMobile"></div></nav>
 <form class="search" id="searchForm"><input data-i18n-ph="search_ph" id="searchInput"><button data-i18n-aria="search_btn">⌕</button></form>
 <div class="theme"><button id="toLight" data-i18n-aria="light">☀</button><button id="toDark" data-i18n-aria="dark">☾</button></div>
@@ -34,11 +34,11 @@ function renderChrome(){
   const f=document.getElementById('chrome-foot');if(f)f.innerHTML=`
 <section class="trust"><div class="wrap"><div><i>📚</i><b data-stat="courses">–</b><span data-i18n="st_courses"></span></div><div><i>🗂️</i><b data-stat="categories">–</b><span data-i18n="st_categories"></span></div><div><i>🎁</i><b data-stat="free_courses">–</b><span data-i18n="tr_free"></span></div><div><i>🧪</i><b data-i18n="tr_test_t"></b><span data-i18n="tr_test"></span></div><div><i>⭐</i><b data-i18n="tr_rev_t"></b><span data-i18n="tr_rev"></span></div></div></section>
 <footer id="footer"><div class="wrap foot">${LOGO}
-<div><h4 data-i18n="f_platform"></h4><a href="/#cat" data-i18n="nav_categories"></a><a href="/#cursos" data-i18n="nav_courses"></a><a href="/creator.html" data-i18n="nav_creators"></a><a href="/#planos" data-i18n="nav_plans"></a></div>
-<div><h4 data-i18n="f_company"></h4><a data-i18n="nav_about"></a><a data-i18n="blog"></a><a data-i18n="careers"></a><a data-i18n="contacts"></a></div>
-<div><h4 data-i18n="f_support"></h4><a href="/info.html?p=faq" data-i18n="faq"></a><a href="/info.html?p=terms" data-i18n="terms"></a><a href="/info.html?p=privacy" data-i18n="privacy"></a><a href="/info.html?p=privacy#cookies" data-i18n="cookies"></a><a href="/info.html?p=refunds" data-i18n="refunds"></a><a href="/info.html?p=creators" data-i18n="creator_terms"></a></div>
-<div><h4 data-i18n="f_follow"></h4><div class="socials"><a aria-label="Instagram">◎</a><a aria-label="YouTube">▶</a><a aria-label="LinkedIn">in</a><a aria-label="X">𝕏</a><a aria-label="Facebook">f</a><a aria-label="TikTok">♪</a></div></div>
-<div><h4 data-i18n="f_news"></h4><form class="news" id="newsForm"><input type="email" required data-i18n-ph="email_ph"><button>→</button></form></div></div>
+<div><h2 data-i18n="f_platform"></h2><a href="/#cat" data-i18n="nav_categories"></a><a href="/#cursos" data-i18n="nav_courses"></a><a href="/#criador" data-i18n="nav_creators"></a><a href="/#planos" data-i18n="nav_plans"></a><a href="/?cat=tech#cursos" data-i18n="c_tech"></a><a href="/?cat=ai#cursos" data-i18n="c_ai"></a><a href="/?cat=biz#cursos" data-i18n="c_biz"></a><a href="/?cat=food#cursos" data-i18n="c_food"></a></div>
+<div><h2 data-i18n="f_company"></h2><a href="/#launch" data-i18n="nav_about"></a><a href="/info.html?p=faq" data-i18n="contacts"></a><a href="/login.html?mode=signup&amp;role=creator" data-i18n="cr_title"></a></div>
+<div><h2 data-i18n="f_support"></h2><a href="/info.html?p=faq" data-i18n="faq"></a><a href="/info.html?p=terms" data-i18n="terms"></a><a href="/info.html?p=privacy" data-i18n="privacy"></a><a href="/info.html?p=privacy#cookies" data-i18n="cookies"></a><a href="/info.html?p=refunds" data-i18n="refunds"></a><a href="/info.html?p=creators" data-i18n="creator_terms"></a></div>
+<div><h2 data-i18n="f_follow"></h2><div class="socials"><a aria-label="Instagram">◎</a><a aria-label="YouTube">▶</a><a aria-label="LinkedIn">in</a><a aria-label="X">𝕏</a><a aria-label="Facebook">f</a><a aria-label="TikTok">♪</a></div></div>
+<div><h2 data-i18n="f_news"></h2><form class="news" id="newsForm"><input type="email" required data-i18n-ph="email_ph"><button>→</button></form></div></div>
 <div class="wrap copy"><span data-i18n="rights"></span><span>Learn. Grow. Explore. Anywhere. <a href="#" class="up">↑</a></span></div></footer>`;
   applyI18n();renderAuth();loadStats();
   const sel=document.getElementById('langSel');sel&&(sel.onchange=()=>{localStorage.setItem('wc-lang',sel.value);const u=new URL(location);u.searchParams.delete('lang');location.href=u});
