@@ -3,7 +3,7 @@ const db=require('./db'),SqliteStore=require('./sessionStore'),seo=require('./se
 const app=express();
 // webhook Stripe precisa do corpo em bruto: montado antes do express.json()
 app.post('/webhook',express.raw({type:'application/json',limit:'1mb'}),async(req,res)=>{
-  if(pay.MODE!=='stripe_test')return res.status(404).end();
+  if(!pay.STRIPE)return res.status(404).end();
   try{const t=await pay.handleWebhook(req.body,req.headers['stripe-signature']);res.json({received:true,type:t})}
   catch(e){console.error('webhook:',e.message);res.status(400).send('invalid')}});
 app.use(express.json());
@@ -100,7 +100,7 @@ app.post('/api/checkout',need('user','creator','admin'),async(req,res)=>{const{k
   // consentimento expresso para início imediato + reconhecimento da perda do direito de livre resolução (conteúdo digital)
   if(req.body.consent!==true)return res.status(400).json({error:'consent_required'});
   const consentAt=new Date().toISOString().replace('T',' ').slice(0,19);
-  if(pay.MODE==='stripe_test'){try{const origin=process.env.PUBLIC_URL||`${req.protocol}://${req.get('host')}`;
+  if(pay.STRIPE){try{const origin=process.env.PUBLIC_URL||`${req.protocol}://${req.get('host')}`;
     const r=await pay.createCheckout({consentAt,user:req.user,kind,amount,promo:promo?promoEnd():null,course_id:cid,lesson_id:lid,origin:origin.replace(/\/$/,''),returnPath:req.body.return_path&&String(req.body.return_path).startsWith('/')&&!String(req.body.return_path).startsWith('//')?req.body.return_path:'/'});
     return res.json({ok:true,mode:pay.MODE,url:r.url,session_id:r.id,amount})}catch(e){console.error('checkout:',e.message);return res.status(502).json({error:'stripe'})}}
   // mock: durante a janela de lançamento cobra o preço promocional (sem renovações automáticas em mock)
@@ -111,19 +111,19 @@ app.post('/api/checkout',need('user','creator','admin'),async(req,res)=>{const{k
 // Área de conta: subscrição + compras; cancelamento self-service (Stripe Customer Portal em teste; mock: marca como não renovável)
 app.get('/api/account',need('user','creator','admin'),async(req,res)=>{const uid=req.user.id;
   const sub=db.get(`SELECT * FROM payments WHERE user_id=? AND kind='subscription' AND status='paid' ORDER BY ends_at DESC LIMIT 1`,[uid]);
-  let stripe=null;if(sub&&sub.stripe_sub&&pay.MODE==='stripe_test')stripe=await pay.subStatus(sub.stripe_sub);
+  let stripe=null;if(sub&&sub.stripe_sub&&pay.STRIPE)stripe=await pay.subStatus(sub.stripe_sub);
   const s2=sub&&db.get('SELECT canceled_at FROM payments WHERE id=?',[sub.id]);
   const purchases=db.all(`SELECT p.id,p.kind,p.amount,p.created_at,p.provider,p.promo,p.consent_at,c.i18n course_i18n,l.i18n lesson_i18n FROM payments p LEFT JOIN courses c ON c.id=p.course_id LEFT JOIN lessons l ON l.id=p.lesson_id WHERE p.user_id=? AND p.status='paid' ORDER BY p.id DESC LIMIT 50`,[uid]);
   res.json({mode:pay.MODE,subscription:sub?{active:sub.ends_at>new Date().toISOString().replace('T',' ').slice(0,19),ends_at:sub.ends_at,amount:sub.amount,promo:sub.promo,provider:sub.provider,canceled:!!(s2&&s2.canceled_at)||(stripe&&stripe.cancel_at_period_end)||false,stripe_status:stripe&&stripe.status}:null,purchases})});
 app.post('/api/billing/portal',need('user','creator','admin'),async(req,res)=>{
-  if(pay.MODE==='stripe_test'){try{const origin=(process.env.PUBLIC_URL||`${req.protocol}://${req.get('host')}`).replace(/\/$/,'');
+  if(pay.STRIPE){try{const origin=(process.env.PUBLIC_URL||`${req.protocol}://${req.get('host')}`).replace(/\/$/,'');
     const url=await pay.portalSession(req.user.id,origin+'/account.html?portal=return');if(!url)return res.status(404).json({error:'no_customer'});return res.json({url})}
     catch(e){console.error('portal:',e.message);return res.status(502).json({error:'stripe'})}}
   // mock: sem renovações reais; regista o cancelamento (acesso mantém-se até ao fim do período pago)
   const sub=db.get(`SELECT id FROM payments WHERE user_id=? AND kind='subscription' AND status='paid' ORDER BY ends_at DESC LIMIT 1`,[req.user.id]);
   if(!sub)return res.status(404).json({error:'no_customer'});db.run(`UPDATE payments SET canceled_at=datetime('now') WHERE id=?`,[sub.id]);res.json({ok:true,mock:true})});
 // regresso do Stripe Checkout: verificação no servidor (sessão obtida à API), concede acesso de imediato
-app.get('/checkout/success',async(req,res)=>{if(pay.MODE!=='stripe_test')return res.redirect('/');
+app.get('/checkout/success',async(req,res)=>{if(!pay.STRIPE)return res.redirect('/');
   try{const r=await pay.fulfillSession(String(req.query.session_id||''));const back=(r.session&&r.session.metadata&&r.session.metadata.return_path)||'/';
     const safe=back.startsWith('/')&&!back.startsWith('//')?back:'/';res.redirect(pay.withQuery(safe,'checkout',r.ok?'success':'pending'))}
   catch(e){console.error('success:',e.message);res.redirect('/?checkout=error')}});

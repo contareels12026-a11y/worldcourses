@@ -1,6 +1,7 @@
-// ===== Pagamentos: Stripe em MODO DE TESTE, ou mock quando não há chave =====
-// Variáveis: STRIPE_SECRET_KEY (sk_test_… obrigatório para Stripe), STRIPE_WEBHOOK_SECRET (whsec_…, opcional)
-// Chaves sk_live_/rk_live_ são recusadas: nenhuma cobrança real é possível.
+// ===== Pagamentos: Stripe (teste ou LIVE, conforme a chave) ou mock quando não há chave =====
+// Variáveis: STRIPE_SECRET_KEY (sk_test_… ou sk_live_…), STRIPE_WEBHOOK_SECRET (whsec_…; obrigatório em live)
+// Produtos/preços (lookup_key), cupão de lançamento e configuração do portal são procurados/criados on-demand
+// na conta/modo da chave em uso — nenhum ID de teste fica guardado ou hardcoded.
 const db=require('./db');
 const PRICES={lesson:4.99,course_tiers:[4.99,12.99],subscription:39.99};
 // Promo de lançamento: cupão "forever" de €10 com redeem_by = fim da janela + subscription schedule que,
@@ -11,9 +12,11 @@ async function ensureCoupon(end){const id=couponId(end);
   try{return(await stripe.coupons.retrieve(id)).id}catch(e){if(e.statusCode!==404)throw e}
   return(await stripe.coupons.create({id,amount_off:PROMO.amount_off,currency:'eur',duration:'forever',redeem_by:Math.floor(end/1000),name:'Lançamento €29,99 até '+end.toISOString().slice(0,10)},{idempotencyKey:'wc-coupon-'+id})).id}
 const KEY=process.env.STRIPE_SECRET_KEY||'';
-if(/^(sk|rk)_live_/.test(KEY)){console.error('ERRO: chaves Stripe LIVE não são permitidas. Use uma chave sk_test_.');process.exit(1)}
-if(KEY&&!KEY.startsWith('sk_test_')){console.error('ERRO: STRIPE_SECRET_KEY inválida (esperado sk_test_…).');process.exit(1)}
-const MODE=KEY?'stripe_test':'mock';
+if(KEY&&!/^sk_(test|live)_/.test(KEY)){console.error('ERRO: STRIPE_SECRET_KEY inválida (esperado sk_test_… ou sk_live_…).');process.exit(1)}
+const LIVE=KEY.startsWith('sk_live_');
+const MODE=KEY?(LIVE?'stripe_live':'stripe_test'):'mock';
+const STRIPE=!!KEY;
+if(LIVE&&!process.env.STRIPE_WEBHOOK_SECRET)console.warn('AVISO: modo LIVE sem STRIPE_WEBHOOK_SECRET — os webhooks serão verificados via API (defina o segredo).');
 const stripe=KEY?require('stripe')(KEY):null;
 // lookup_key -> definição; criados idempotentemente no arranque
 const CATALOG={
@@ -25,13 +28,13 @@ const CATALOG={
 const priceIds={};
 async function setup(){
   if(!stripe)return;
-  const acct=await stripe.balance.retrieve();if(acct.livemode)throw new Error('Stripe devolveu livemode=true — recusado');
+  const acct=await stripe.balance.retrieve();if(!!acct.livemode!==LIVE)throw new Error(`Stripe livemode=${acct.livemode} não corresponde à chave (${MODE})`);
   const {data}=await stripe.prices.list({lookup_keys:Object.keys(CATALOG),active:true,limit:20});
   for(const p of data)priceIds[p.lookup_key]=p.id;
   for(const[lk,d]of Object.entries(CATALOG)){if(priceIds[lk])continue;
     const p=await stripe.prices.create({currency:'eur',unit_amount:d.amount,lookup_key:lk,transfer_lookup_key:true,product_data:{name:d.name,metadata:{app:'worldcourses'}},...(d.recurring?{recurring:d.recurring}:{})},{idempotencyKey:'wc-price-'+lk+'-v1'});
     priceIds[lk]=p.id}
-  console.log('Stripe (teste) pronto:',Object.keys(priceIds).length,'preços');
+  console.log(`Stripe (${LIVE?'LIVE':'teste'}) pronto:`,Object.keys(priceIds).length,'preços');
 }
 function lookupFor(kind,amount){if(kind==='subscription')return'wc_sub_3999';if(kind==='lesson')return'wc_lesson_499';return amount>5?'wc_course_1299':'wc_course_499'}
 // acrescenta ?k=v ANTES do #hash (ex.: /#planos -> /?checkout=success#planos)
@@ -39,9 +42,10 @@ function withQuery(p,k,v){const i=p.indexOf('#'),base=i<0?p:p.slice(0,i),hash=i<
 async function createCheckout({user,kind,amount,promo,course_id,lesson_id,origin,returnPath,consentAt}){
   const meta={app:'worldcourses',consent_at:String(consentAt||''),user_id:String(user.id),kind,course_id:String(course_id||''),lesson_id:String(lesson_id||''),return_path:String(returnPath||'/').slice(0,400),promo_until:promo?String(Math.floor(promo/1000)):''};
   const coupon=kind==='subscription'&&promo?await ensureCoupon(promo):null;
+  const lk=lookupFor(kind,amount);if(!priceIds[lk])await setup();if(!priceIds[lk])throw new Error('price missing: '+lk);
   const s=await stripe.checkout.sessions.create({
     mode:kind==='subscription'?'subscription':'payment',
-    line_items:[{price:priceIds[lookupFor(kind,amount)],quantity:1}],
+    line_items:[{price:priceIds[lk],quantity:1}],
     ...(coupon?{discounts:[{coupon}]}:{}),
     client_reference_id:String(user.id),customer_email:user.email,metadata:meta,
     ...(kind==='subscription'?{subscription_data:{metadata:meta}}:{payment_intent_data:{metadata:meta}}),
@@ -55,16 +59,16 @@ const exists=ref=>!!db.get('SELECT id FROM payments WHERE provider_ref=?',[ref])
 function recordOneTime(s){
   if(s.payment_status!=='paid'||exists(s.id))return false;const m=s.metadata||{};
   db.run(`INSERT INTO payments(user_id,kind,course_id,lesson_id,amount,provider,provider_ref,status,stripe_customer,consent_at) VALUES(?,?,?,?,?,?,?,?,?,?)`,
-    [+m.user_id,m.kind,m.course_id?+m.course_id:null,m.lesson_id?+m.lesson_id:null,s.amount_total/100,'stripe_test',s.id,'paid',typeof s.customer==='string'?s.customer:(s.customer&&s.customer.id)||null,m.consent_at||null]);return true}
+    [+m.user_id,m.kind,m.course_id?+m.course_id:null,m.lesson_id?+m.lesson_id:null,s.amount_total/100,MODE,s.id,'paid',typeof s.customer==='string'?s.customer:(s.customer&&s.customer.id)||null,m.consent_at||null]);return true}
 function recordInvoice(inv,sub,meta){
   if(inv.status!=='paid'||exists(inv.id))return false;const m=meta||(sub&&sub.metadata)||{};if(!m.user_id)return false;
   const line=inv.lines&&inv.lines.data&&inv.lines.data[0],per=(line&&line.period)||{start:inv.period_start,end:inv.period_end};
   const disc=(inv.total_discount_amounts||[]).some(d=>d.amount>0)||(inv.discounts||[]).length>0;
   db.run(`INSERT INTO payments(user_id,kind,amount,provider,provider_ref,status,starts_at,ends_at,stripe_sub,promo,stripe_customer,consent_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
-    [+m.user_id,'subscription',inv.amount_paid/100,'stripe_test',inv.id,'paid',iso(per.start),iso(per.end),(typeof inv.subscription==='string'?inv.subscription:null)||(inv.parent&&inv.parent.subscription_details&&inv.parent.subscription_details.subscription)||(sub&&sub.id)||null,disc?'launch_window':null,typeof inv.customer==='string'?inv.customer:(inv.customer&&inv.customer.id)||null,m.consent_at||null]);return true}
+    [+m.user_id,'subscription',inv.amount_paid/100,MODE,inv.id,'paid',iso(per.start),iso(per.end),(typeof inv.subscription==='string'?inv.subscription:null)||(inv.parent&&inv.parent.subscription_details&&inv.parent.subscription_details.subscription)||(sub&&sub.id)||null,disc?'launch_window':null,typeof inv.customer==='string'?inv.customer:(inv.customer&&inv.customer.id)||null,m.consent_at||null]);return true}
 async function fulfillSession(sessionId){
   const s=await stripe.checkout.sessions.retrieve(sessionId,{expand:['invoice','subscription']});
-  if(s.livemode||(s.metadata||{}).app!=='worldcourses')return{ok:false};
+  if(!!s.livemode!==LIVE||(s.metadata||{}).app!=='worldcourses')return{ok:false};
   if(s.mode==='payment'){recordOneTime(s);return{ok:s.payment_status==='paid',session:s}}
   if(s.mode==='subscription'&&s.invoice){recordInvoice(s.invoice,s.subscription,s.metadata);try{await scheduleLaunchEnd(s.subscription,s.metadata)}catch(e){console.error('schedule:',e.message)}return{ok:s.invoice.status==='paid',session:s}}
   return{ok:false,session:s};
@@ -74,7 +78,7 @@ async function handleWebhook(raw,sig){
   let ev;const secret=process.env.STRIPE_WEBHOOK_SECRET;
   if(secret)ev=stripe.webhooks.constructEvent(raw,sig,secret);
   else{const id=JSON.parse(raw.toString()).id;ev=await stripe.events.retrieve(id)}
-  if(ev.livemode)return;
+  if(!!ev.livemode!==LIVE)return 'ignored_mode_mismatch';
   const o=ev.data.object;
   if(ev.type==='checkout.session.completed'||ev.type==='checkout.session.async_payment_succeeded')await fulfillSession(o.id);
   else if(ev.type==='invoice.paid'||ev.type==='invoice.payment_succeeded'){const subId=o.subscription||(o.parent&&o.parent.subscription_details&&o.parent.subscription_details.subscription);
@@ -109,6 +113,7 @@ async function scheduleLaunchEnd(sub,meta){
   if(typeof sub==='string')sub=await stripe.subscriptions.retrieve(sub);
   if(sub.schedule)return; // já agendada
   const sch=await stripe.subscriptionSchedules.create({from_subscription:sub.id});
+  if(!priceIds.wc_sub_3999)await setup();
   const ph=sch.phases[0],price=priceIds.wc_sub_3999;
   await stripe.subscriptionSchedules.update(sch.id,{end_behavior:'release',phases:[
     {items:[{price,quantity:1}],start_date:ph.start_date,end_date:until,discounts:ph.discounts&&ph.discounts.length?ph.discounts.map(d=>({coupon:d.coupon||undefined,discount:d.discount||undefined})):[{coupon:couponId(new Date(until*1000))}],proration_behavior:'none'},
@@ -125,4 +130,4 @@ function startPromoJob(getEnd){if(!stripe)return;const run=async()=>{try{const e
 async function charge({kind,amount}){ // modo mock
   return{provider:'mock',ref:'mock_'+kind+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7),status:'paid',amount};
 }
-module.exports={withQuery,portalSession,subStatus,PROMO,startPromoJob,PRICES,MODE,setup,createCheckout,fulfillSession,handleWebhook,charge,stripe:()=>stripe};
+module.exports={LIVE,STRIPE,withQuery,portalSession,subStatus,PROMO,startPromoJob,PRICES,MODE,setup,createCheckout,fulfillSession,handleWebhook,charge,stripe:()=>stripe};
