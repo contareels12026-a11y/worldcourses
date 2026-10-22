@@ -1,5 +1,5 @@
 // ===== Pagamentos: Stripe (teste ou LIVE, conforme a chave) ou mock quando não há chave =====
-// Variáveis: STRIPE_SECRET_KEY (sk_test_… ou sk_live_…), STRIPE_WEBHOOK_SECRET (whsec_…; obrigatório em live)
+// Variáveis: STRIPE_SECRET_KEY (sk_/rk_ test_… ou live_…; rk_ = chave restrita), STRIPE_WEBHOOK_SECRET (whsec_…; obrigatório em live)
 // Produtos/preços (lookup_key), cupão de lançamento e configuração do portal são procurados/criados on-demand
 // na conta/modo da chave em uso — nenhum ID de teste fica guardado ou hardcoded.
 const db=require('./db');
@@ -12,8 +12,8 @@ async function ensureCoupon(end){const id=couponId(end);
   try{return(await stripe.coupons.retrieve(id)).id}catch(e){if(e.statusCode!==404)throw e}
   return(await stripe.coupons.create({id,amount_off:PROMO.amount_off,currency:'eur',duration:'forever',redeem_by:Math.floor(end/1000),name:'Lançamento €29,99 até '+end.toISOString().slice(0,10)},{idempotencyKey:'wc-coupon-'+id})).id}
 const KEY=process.env.STRIPE_SECRET_KEY||'';
-if(KEY&&!/^sk_(test|live)_/.test(KEY)){console.error('ERRO: STRIPE_SECRET_KEY inválida (esperado sk_test_… ou sk_live_…).');process.exit(1)}
-const LIVE=KEY.startsWith('sk_live_');
+if(KEY&&!/^(sk|rk)_(test|live)_/.test(KEY)){console.error('ERRO: STRIPE_SECRET_KEY inválida (esperado sk_/rk_ test_ ou live_).');process.exit(1)}
+const LIVE=/^(sk|rk)_live_/.test(KEY),RESTRICTED=KEY.startsWith('rk_');
 const MODE=KEY?(LIVE?'stripe_live':'stripe_test'):'mock';
 const STRIPE=!!KEY;
 if(LIVE&&!process.env.STRIPE_WEBHOOK_SECRET)console.warn('AVISO: modo LIVE sem STRIPE_WEBHOOK_SECRET — os webhooks serão verificados via API (defina o segredo).');
@@ -28,7 +28,9 @@ const CATALOG={
 const priceIds={};
 async function setup(){
   if(!stripe)return;
-  const acct=await stripe.balance.retrieve();if(!!acct.livemode!==LIVE)throw new Error(`Stripe livemode=${acct.livemode} não corresponde à chave (${MODE})`);
+  // auto-verificação: chaves restritas podem não ter permissão de leitura do saldo -> só aviso
+  try{const acct=await stripe.balance.retrieve();if(!!acct.livemode!==LIVE)throw Object.assign(new Error(`Stripe livemode=${acct.livemode} não corresponde à chave (${MODE})`),{fatal:true})}
+  catch(e){if(e.fatal)throw e;console.warn('AVISO: verificação de conta Stripe ignorada'+(RESTRICTED?' (chave restrita)':'')+':',e.code||e.type||'',e.message)}
   const {data}=await stripe.prices.list({lookup_keys:Object.keys(CATALOG),active:true,limit:20});
   for(const p of data)priceIds[p.lookup_key]=p.id;
   for(const[lk,d]of Object.entries(CATALOG)){if(priceIds[lk])continue;
