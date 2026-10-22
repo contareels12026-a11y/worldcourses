@@ -177,6 +177,29 @@ app.get('/api/admin/feedback.csv',need('admin'),(req,res)=>{const q=v=>'"'+Strin
   const rows=db.all('SELECT f.created_at,u.name,u.email,f.rating,f.comment,f.improve,f.course_id,f.lang FROM site_feedback f JOIN users u ON u.id=f.user_id ORDER BY f.created_at');
   res.set('Content-Disposition','attachment; filename="site_feedback.csv"').type('text/csv').send('\ufeff'+['created_at,name,email,rating,comment,improve,course_id,lang',...rows.map(r=>[r.created_at,r.name,r.email,r.rating,r.comment,r.improve,r.course_id,r.lang].map(q).join(','))].join('\r\n'))});
 
+// ---- ideias/opinião pública (/opiniao): sem login; honeypot, limites de tamanho e rate limit por IP/sessão
+const IDEA_CATS=['tech','ai','biz','design','diy','fitness','food','health','home','influencer','mech','travel','other'];
+const ideaHits=new Map();const ipHash=ip=>require('crypto').createHash('sha256').update(String(ip)+(process.env.SESSION_SECRET||'wc')).digest('hex').slice(0,16);
+function ideaLimited(key){const now=Date.now(),arr=(ideaHits.get(key)||[]).filter(x=>now-x<3600e3);if(arr.length>=5){ideaHits.set(key,arr);return true}arr.push(now);ideaHits.set(key,arr);return false}
+setInterval(()=>{const now=Date.now();for(const[k,a]of ideaHits)if(!a.some(x=>now-x<3600e3))ideaHits.delete(k)},600e3).unref();
+app.post('/api/ideas',(req,res)=>{const b=req.body||{};
+  if(b.website)return res.json({ok:true}); // honeypot: bots recebem "ok" mas nada é guardado
+  const s=(v,n)=>String(v??'').trim().slice(0,n);
+  const want=s(b.want,1000),topic=s(b.topic,200),message=s(b.message,2000),email=s(b.email,200).toLowerCase();
+  const category=IDEA_CATS.includes(b.category)?b.category:null,wc=['yes','no'].includes(b.would_create)?b.would_create:null;
+  if(!want&&!topic&&!message)return res.status(400).json({error:'empty'});
+  if(String(b.want||'').length>1000||String(b.topic||'').length>200||String(b.message||'').length>2000)return res.status(400).json({error:'too_long'});
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return res.status(400).json({error:'email'});
+  if((want+message).match(/https?:\/\//g)?.length>3)return res.status(400).json({error:'links'});
+  const h=ipHash(req.ip);if(ideaLimited('ip:'+h)||(req.session&&req.session.id&&ideaLimited('s:'+req.session.id)))return res.status(429).json({error:'rate'});
+  const u=me(req);db.run('INSERT INTO ideas(user_id,want,topic,category,would_create,email,message,lang,ip_hash) VALUES(?,?,?,?,?,?,?,?,?)',[u?u.id:null,want,topic,category,wc,email||null,message,s(b.lang,5),h]);
+  res.json({ok:true})});
+app.get('/api/admin/ideas',need('admin'),(req,res)=>res.json(db.all('SELECT i.*,u.name user_name,u.email user_email FROM ideas i LEFT JOIN users u ON u.id=i.user_id ORDER BY i.created_at DESC,i.id DESC')));
+app.delete('/api/admin/ideas/:id',need('admin'),(req,res)=>{db.run('DELETE FROM ideas WHERE id=?',[+req.params.id]);res.json({ok:true})});
+app.get('/api/admin/ideas.csv',need('admin'),(req,res)=>{const q=v=>{let x=String(v??'');if(/^[=+\-@]/.test(x))x="'"+x;return'"'+x.replace(/"/g,'""')+'"'};
+  const rows=db.all('SELECT i.*,u.email user_email FROM ideas i LEFT JOIN users u ON u.id=i.user_id ORDER BY i.created_at DESC,i.id DESC');const K=['id','created_at','want','topic','category','would_create','email','user_email','message','lang'];
+  res.set('Content-Disposition','attachment; filename="ideas.csv"').type('text/csv').send('\ufeff'+[K.join(','),...rows.map(r=>K.map(k=>q(r[k])).join(','))].join('\r\n'))});
+
 // ---- admin
 app.get('/api/admin/payouts',need('admin'),(req,res)=>res.json(payout.compute(req.query.month)));
 app.get('/api/admin/settings',need('admin'),(req,res)=>res.json(db.settings()));

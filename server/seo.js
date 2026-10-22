@@ -14,6 +14,7 @@ const M={
  info_privacy:{t:['Política de Privacidade — The World Courses','Privacy Policy — The World Courses','Politique de confidentialité — The World Courses'],d:['RGPD, dados tratados, Stripe e cookies.','GDPR, data processed, Stripe and cookies.','RGPD, données traitées, Stripe et cookies.']},
  info_refunds:{t:['Reembolsos e Cancelamento — The World Courses','Refunds & Cancellation — The World Courses','Remboursements et résiliation — The World Courses'],d:['Direito de livre resolução de 14 dias, conteúdo digital e cancelamento.','14-day right of withdrawal, digital content and cancellation.','Droit de rétractation de 14 jours, contenu numérique et résiliation.']},
  info_creators:{t:['Termos de Criador — The World Courses','Creator Terms — The World Courses','Conditions créateurs — The World Courses'],d:['Fórmula de pagamento, quota da plataforma, licença e conteúdo proibido.','Payout formula, platform share, licensing and prohibited content.','Formule de rémunération, part de la plateforme, licence et contenus interdits.']},
+ opiniao:{t:['Dá-nos a tua opinião — The World Courses','Give us your feedback — The World Courses','Donnez-nous votre avis — The World Courses'],d:['Diz-nos que cursos e temas gostavas de ver na The World Courses. A tua opinião ajuda a escolher os próximos cursos.','Tell us which courses and topics you would like to see on The World Courses. Your feedback helps choose the next courses.','Dites-nous quels cours et sujets vous aimeriez voir sur The World Courses. Votre avis aide à choisir les prochains cours.']},
  admin:{t:['Administração — The World Courses','Admin — The World Courses','Administration — The World Courses'],d:['Administração da plataforma.','Platform administration.','Administration de la plateforme.'],noindex:1},
 };
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -29,7 +30,7 @@ const ld=o=>`<script type="application/ld+json">${JSON.stringify(o).replace(/</g
 function prerender(html,i){return html.replace(/(<(\w+)\b[^>]*\sdata-i18n="(\w+)"[^>]*>)(<\/\2>)/g,(m,open,tag,k,close)=>{const v=tr_(k,i);return v==null?m:open+v+close})}
 function page(name,file_){return(req,res,next)=>{
   const lang=LANGS.includes(req.query.lang)?req.query.lang:'pt',i=LANGS.indexOf(lang);
-  let body=null,main=null,extra='',ogType='website',imgAlt='The World Courses',title,desc,img=BASE+'/assets/og.jpg',noindex=false,pathQ=req.path==='/index.html'?'/':req.path;
+  let body=null,main=null,extra='',ogType='website',imgAlt='The World Courses',title,desc,img=BASE+'/assets/og.jpg',noindex=false,pathQ=req.path==='/index.html'?'/':name==='opiniao'?'/opiniao':req.path;
   if(name==='course'){const c=db.get('SELECT * FROM courses WHERE id=?',[+req.query.id||0]);if(!c)return next();
     const x=JSON.parse(c.i18n);const tr=x[lang]||x.pt;title=`${tr.title} — The World Courses`;desc=tr.description||tr.subtitle;img=BASE+'/'+c.image;imgAlt=tr.title;pathQ=`/course.html?id=${c.id}`;ogType='article';
     const cat=(tr_(CAT_KEY(c.category),i)||c.category).replace(/<br>/g,' '),u=db.get('SELECT name FROM users WHERE id=?',[c.creator_id]);
@@ -96,9 +97,10 @@ function mount(app){
   app.get('/creator.html',page('creator','creator.html'));
   app.get('/info.html',page('info','info.html'));
   app.get('/account.html',page('account','account.html'));
+  app.get(['/opiniao','/feedback','/opiniao.html'],page('opiniao','opiniao.html'));
   app.get('/admin.html',page('admin','admin.html'));
   app.get('/robots.txt',(req,res)=>res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /admin.html\nDisallow: /creator.html\nDisallow: /account.html\n\nSitemap: ${BASE}/sitemap.xml\n`));
-  app.get('/sitemap.xml',(req,res)=>{const paths=['/','/login.html',...INFO.map(p=>`/info.html?p=${p}`),...db.all('SELECT id FROM courses WHERE published=1 ORDER BY id').map(c=>`/course.html?id=${c.id}`)];
+  app.get('/sitemap.xml',(req,res)=>{const paths=['/','/opiniao','/login.html',...INFO.map(p=>`/info.html?p=${p}`),...db.all('SELECT id FROM courses WHERE published=1 ORDER BY id').map(c=>`/course.html?id=${c.id}`)];
     const u=(p,l)=>esc(BASE+p+(p.includes('?')?'&':'?')+'lang='+l);
     const blogUrls=['/blog',...posts().map(p=>'/blog/'+p.slug)].map(p=>`<url><loc>${esc(BASE+p)}</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`).join('\n');
     res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n`+

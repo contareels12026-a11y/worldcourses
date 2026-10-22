@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css?v=15"><link rel="stylesheet" href="/platform.css?v=15">
+<script src="/i18n.js?v=15"></script><script src="/app.js?v=15"></script><title>Dá-nos a tua opinião — The World Courses</title></head><body data-page="opiniao">
+<div id="chrome-top"></div>
+<main class="wrap page"><h1 data-i18n="op_title"></h1><p class="lead2" data-i18n="op_lead"></p>
+<div id="opBox"><form id="opForm" class="panel form-grid op-form" novalidate>
+<label class="full"><span data-i18n="op_want"></span><textarea name="want" maxlength="1000"></textarea></label>
+<label><span data-i18n="op_topic"></span><input name="topic" maxlength="200"></label>
+<label><span data-i18n="op_cat"></span><select name="category" id="opCat"></select></label>
+<div class="full"><span data-i18n="op_create"></span><div class="op-radio"><label><input type="radio" name="would_create" value="yes"> <span data-i18n="op_yes"></span></label><label><input type="radio" name="would_create" value="no"> <span data-i18n="op_no"></span></label></div></div>
+<label class="full"><span data-i18n="op_email"></span><input type="email" name="email" maxlength="200" autocomplete="email"></label>
+<label class="full"><span data-i18n="op_msg"></span><textarea name="message" maxlength="2000"></textarea></label>
+<div class="hp" aria-hidden="true"><label>Website<input name="website" tabindex="-1" autocomplete="off"></label></div>
+<p class="tiny full" data-i18n="op_privacy"></p>
+<div class="full"><button class="btn gold" data-i18n="op_send"></button> <span id="opErr" class="err" role="alert"></span></div></form></div>
+</main>
+<div id="chrome-foot"></div>
+<script>
+const CATS=['tech','ai','biz','design','diy','fitness','food','health','home','influencer','mech','travel'];
+READY.then(()=>{const sel=document.getElementById('opCat');
+ sel.innerHTML=`<option value="">${t('op_cat_none')}</option>`+CATS.map(c=>`<option value="${c}">${t('c_'+c).replace(/<br>/g,' ')}</option>`).join('')+`<option value="other">${t('op_other')}</option>`;
+ const f=document.getElementById('opForm'),err=document.getElementById('opErr');
+ f.onsubmit=async e=>{e.preventDefault();err.textContent='';const d=Object.fromEntries(new FormData(f));
+  if(!(d.want||'').trim()&&!(d.topic||'').trim()&&!(d.message||'').trim()){err.textContent=t('op_need');return}
+  if(d.email&&!f.email.checkValidity()){err.textContent=t('op_err');return}
+  const btn=f.querySelector('button');btn.disabled=true;
+  try{await api('/api/ideas',{method:'POST',body:{...d,lang:LANG}});
+   document.getElementById('opBox').innerHTML=`<div class="panel" role="status"><h2>✓ ${t('op_thanks_t')}</h2><p>${t('op_thanks')}</p><a href="/opiniao" class="btn ghost sm">${t('op_again')}</a> <a href="/#cursos" class="btn gold sm">${t('nav_courses')} →</a></div>`}
+  catch(x){err.textContent=t(x.status===429?'op_rate':'op_err');btn.disabled=false}}});
+</script></body></html>
