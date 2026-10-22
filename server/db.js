@@ -1,5 +1,6 @@
 // SQLite (sql.js / WebAssembly) com persistência em ficheiro data/app.sqlite
 const fs=require('fs'),path=require('path'),initSql=require('sql.js');
+const turso=require('./turso');
 const FILE=process.env.DB_FILE||path.join(__dirname,'..','data','app.sqlite');
 let db;
 const SCHEMA=`
@@ -15,27 +16,40 @@ const DEFAULTS={launch_date:'2026-10-09',feedback_months:'6',promo_enabled:'1',p
 async function init(){
   const SQL=await initSql();
   fs.mkdirSync(path.dirname(FILE),{recursive:true});
-  db=fs.existsSync(FILE)?new SQL.Database(fs.readFileSync(FILE)):new SQL.Database();
-  db.exec(SCHEMA);
-  for(const q of['ALTER TABLE payments ADD COLUMN stripe_sub TEXT','ALTER TABLE payments ADD COLUMN stripe_customer TEXT','ALTER TABLE payments ADD COLUMN consent_at TEXT','ALTER TABLE payments ADD COLUMN canceled_at TEXT','ALTER TABLE courses ADD COLUMN spoken_language TEXT','ALTER TABLE lessons ADD COLUMN spoken_language TEXT','ALTER TABLE lessons ADD COLUMN has_captions INTEGER DEFAULT 0','ALTER TABLE payments ADD COLUMN promo TEXT'])try{db.exec(q)}catch{}
+  const local=()=>fs.existsSync(FILE)?new SQL.Database(fs.readFileSync(FILE)):new SQL.Database();
+  let seedTurso=false;
+  if(turso.enabled()){
+    if(await turso.isEmpty()){console.log('[turso] base vazia: a semear a partir de',FILE);db=local();seedTurso=true}
+    else{db=await turso.loadInto(SQL);console.log('[turso] dados carregados do Turso')}
+  }else db=local();
+  mirror=!seedTurso&&turso.enabled(); // se for semear, envia tudo no fim (pushAll)
+  exec(SCHEMA);
+  for(const q of['ALTER TABLE payments ADD COLUMN stripe_sub TEXT','ALTER TABLE payments ADD COLUMN stripe_customer TEXT','ALTER TABLE payments ADD COLUMN consent_at TEXT','ALTER TABLE payments ADD COLUMN canceled_at TEXT','ALTER TABLE courses ADD COLUMN spoken_language TEXT','ALTER TABLE lessons ADD COLUMN spoken_language TEXT','ALTER TABLE lessons ADD COLUMN has_captions INTEGER DEFAULT 0','ALTER TABLE payments ADD COLUMN promo TEXT'])try{exec(q)}catch{}
   // recibos por email: pagamentos já existentes ficam marcados 'legacy' (nunca recebem email retroativo)
-  try{db.exec('ALTER TABLE payments ADD COLUMN receipt_sent_at TEXT');db.exec("UPDATE payments SET receipt_sent_at='legacy'")}catch(e){}
-  db.exec(`CREATE TABLE IF NOT EXISTS site_feedback(id INTEGER PRIMARY KEY,user_id INTEGER NOT NULL,course_id INTEGER,rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),comment TEXT,improve TEXT,lang TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+  try{exec('ALTER TABLE payments ADD COLUMN receipt_sent_at TEXT');exec("UPDATE payments SET receipt_sent_at='legacy'")}catch(e){}
+  exec(`CREATE TABLE IF NOT EXISTS site_feedback(id INTEGER PRIMARY KEY,user_id INTEGER NOT NULL,course_id INTEGER,rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),comment TEXT,improve TEXT,lang TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
     CREATE TABLE IF NOT EXISTS feedback_state(user_id INTEGER PRIMARY KEY,status TEXT NOT NULL,later_course_id INTEGER,updated_at TEXT DEFAULT CURRENT_TIMESTAMP);`);
-  db.exec(`CREATE TABLE IF NOT EXISTS ideas(id INTEGER PRIMARY KEY,user_id INTEGER,want TEXT,topic TEXT,category TEXT,would_create TEXT,email TEXT,message TEXT,lang TEXT,ip_hash TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
+  exec(`CREATE TABLE IF NOT EXISTS ideas(id INTEGER PRIMARY KEY,user_id INTEGER,want TEXT,topic TEXT,category TEXT,would_create TEXT,email TEXT,message TEXT,lang TEXT,ip_hash TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
   backfillLanguages();
   for(const[k,v]of Object.entries(DEFAULTS))run('INSERT OR IGNORE INTO settings(key,value) VALUES(?,?)',[k,v]);
+  exec('CREATE TABLE IF NOT EXISTS sessions(sid TEXT PRIMARY KEY,sess TEXT NOT NULL,expires INTEGER NOT NULL)');
   save();
+  if(seedTurso){await turso.pushAll(db,undefined,m=>console.log('[turso]'+m));mirror=true;console.log('[turso] semeado')}
+  if(turso.enabled()){const bye=async sig=>{console.log(`[turso] ${sig}: a esvaziar fila (${turso.pendingCount()})`);await turso.flush();process.exit(0)};
+    process.once('SIGTERM',()=>bye('SIGTERM'));process.once('SIGINT',()=>bye('SIGINT'))}
 }
+// mirror=true: cada mutação é também replicada (por ordem) para o Turso
+let mirror=false;
+function exec(sql){db.exec(sql);if(mirror)turso.enqueue({multi:sql})}
 let t;function save(){clearTimeout(t);t=setTimeout(()=>fs.writeFileSync(FILE,Buffer.from(db.export())),50)}
 function saveNow(){fs.writeFileSync(FILE,Buffer.from(db.export()))}
 function all(sql,p=[]){const s=db.prepare(sql);s.bind(p);const r=[];while(s.step())r.push(s.getAsObject());s.free();return r}
 function get(sql,p=[]){return all(sql,p)[0]}
-function run(sql,p=[]){db.run(sql,p);const id=get('SELECT last_insert_rowid() id').id;save();return id}
+function run(sql,p=[]){db.run(sql,p);if(mirror)turso.enqueue({sql,args:p.map(v=>v===undefined?null:v)});const id=get('SELECT last_insert_rowid() id').id;save();return id}
 function settings(){const o={};for(const r of all('SELECT * FROM settings'))o[r.key]=/^-?\d+(\.\d+)?$/.test(r.value)?Number(r.value):r.value;return o}
 // Idioma falado verificado por vídeo (server/video_langs.json) -> preenche aulas/cursos em falta
 function backfillLanguages(){let map={};try{map=require('./video_langs.json')}catch{return}
-  for(const l of all('SELECT id,youtube_id FROM lessons WHERE spoken_language IS NULL AND youtube_id IS NOT NULL')){const m=map[l.youtube_id];if(m)db.run('UPDATE lessons SET spoken_language=?,has_captions=? WHERE id=?',[m.lang,m.captions,l.id])}
-  for(const c of all('SELECT id FROM courses WHERE spoken_language IS NULL')){const r=get(`SELECT spoken_language s,COUNT(*) n FROM lessons WHERE course_id=? AND spoken_language IS NOT NULL AND spoken_language<>'none' GROUP BY s ORDER BY n DESC`,[c.id]);if(r)db.run('UPDATE courses SET spoken_language=? WHERE id=?',[r.s,c.id])}
+  for(const l of all('SELECT id,youtube_id FROM lessons WHERE spoken_language IS NULL AND youtube_id IS NOT NULL')){const m=map[l.youtube_id];if(m)run('UPDATE lessons SET spoken_language=?,has_captions=? WHERE id=?',[m.lang,m.captions,l.id])}
+  for(const c of all('SELECT id FROM courses WHERE spoken_language IS NULL')){const r=get(`SELECT spoken_language s,COUNT(*) n FROM lessons WHERE course_id=? AND spoken_language IS NOT NULL AND spoken_language<>'none' GROUP BY s ORDER BY n DESC`,[c.id]);if(r)run('UPDATE courses SET spoken_language=? WHERE id=?',[r.s,c.id])}
   save()}
-module.exports={backfillLanguages,init,all,get,run,settings,saveNow,FILE};
+module.exports={exec,backfillLanguages,init,all,get,run,settings,saveNow,FILE};
