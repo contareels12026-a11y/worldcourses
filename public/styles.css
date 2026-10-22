@@ -13,6 +13,7 @@ a{color:inherit;text-decoration:none;cursor:pointer}button{font:inherit;cursor:p
 .header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .header .wrap{display:flex;align-items:center;gap:24px;padding:14px 32px}
 .logo{display:flex;flex-direction:column;align-items:center;line-height:1}
+.logo-top{font-family:Cinzel,serif;font-size:11px;font-weight:700;letter-spacing:4px;color:var(--gold);margin-bottom:3px}
 .logo-word{font-family:Cinzel,serif;font-size:40px;font-weight:700;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;display:flex;align-items:center;letter-spacing:1px}
 .globe{width:34px;height:34px;border-radius:50%;background:url(assets/earth.jpg) 30% 50%/220% 100%,#123;box-shadow:inset -8px -4px 12px #000c,0 0 0 2px #d8b46a,0 0 14px #d8b46a88;margin:0 1px;animation:spin 40s linear infinite}
 .logo small{font-size:8.5px;letter-spacing:3px;color:var(--mut);margin-top:6px}
@@ -106,7 +107,7 @@ footer{padding-top:34px}.foot{display:grid;grid-template-columns:1.6fr repeat(3,
 }
 @media(max-width:600px){
  .wrap,.sec,.topbar .wrap,.header .wrap{padding-left:16px;padding-right:16px}.topbar nav a:not(.lang){display:none}
- .logo-word{font-size:30px}.globe{width:26px;height:26px}.logo small{font-size:6.5px;letter-spacing:2px}
+ .logo-word{font-size:30px}.globe{width:26px;height:26px}.logo small{font-size:6.5px;letter-spacing:2px}.logo-top{font-size:8.5px;letter-spacing:3px}
  .stats{gap:20px;justify-content:space-between}.lead{font-size:15px}
  .cats{grid-template-columns:repeat(3,1fr)}.card{flex-basis:78%}.testis figure{flex-basis:88%}
  .promo-grid{grid-template-columns:1fr}.mais{grid-column:auto}.mini{flex-wrap:wrap;gap:14px}.creator{flex-direction:column;align-items:flex-start}

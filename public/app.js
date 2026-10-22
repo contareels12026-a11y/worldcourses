@@ -19,7 +19,7 @@ function applyI18n(root=document){if(root===document&&document.body.dataset.page
   root.querySelectorAll('[data-i18n]').forEach(e=>e.innerHTML=t(e.dataset.i18n));
   root.querySelectorAll('[data-i18n-ph]').forEach(e=>e.placeholder=t(e.dataset.i18nPh));
   root.querySelectorAll('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-label',t(e.dataset.i18nAria)))}
-const LOGO=`<a href="/" class="logo"><span class="logo-word"><span class="logo-c">C</span><span class="globe"></span>URSES</span><small>LEARN · GROW · EXPLORE · ANYWHERE</small></a>`;
+const LOGO=`<a href="/" class="logo"><span class="logo-top">THE WORLD</span><span class="logo-word"><span class="logo-c">C</span><span class="globe"></span>URSES</span><small>LEARN · GROW · EXPLORE · ANYWHERE</small></a>`;
 function renderChrome(){
   const top=document.getElementById('chrome-top');if(top)top.innerHTML=`
 <div class="topbar"><div class="wrap"><span data-i18n="topbar"></span><nav><a href="/info.html?p=faq" data-i18n="help"></a><a href="#footer" data-i18n="contacts"></a>
