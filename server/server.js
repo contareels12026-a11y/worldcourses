@@ -200,6 +200,27 @@ app.get('/api/admin/ideas.csv',need('admin'),(req,res)=>{const q=v=>{let x=Strin
   const rows=db.all('SELECT i.*,u.email user_email FROM ideas i LEFT JOIN users u ON u.id=i.user_id ORDER BY i.created_at DESC,i.id DESC');const K=['id','created_at','want','topic','category','would_create','email','user_email','message','lang'];
   res.set('Content-Disposition','attachment; filename="ideas.csv"').type('text/csv').send('\ufeff'+[K.join(','),...rows.map(r=>K.map(k=>q(r[k])).join(','))].join('\r\n'))});
 
+// ---- contador de visitas (cookieless): beacon POST /api/track {path,referrer}
+const BOT_RE=/bot|crawl|spider|slurp|bingpreview|facebookexternalhit|embedly|quora|pinterest|vkshare|whatsapp|telegram|discord|preview|headless|phantom|puppeteer|playwright|selenium|lighthouse|pagespeed|gtmetrix|curl|wget|python|httpclient|axios|node-fetch|go-http|java\/|okhttp|libwww|scrapy|monitor|uptime|pingdom/i;
+const STATIC_RE=/\.(js|css|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|map|txt|xml|json|mp4|webm|pdf)$/i;
+app.post('/api/track',(req,res)=>{res.status(204).end();try{
+  const ua=String(req.get('user-agent')||'');if(!ua||BOT_RE.test(ua))return;
+  const u=me(req);if(u&&u.role==='admin')return;
+  let p=String((req.body||{}).path||'').split(/[?#]/)[0].slice(0,200);
+  if(!p.startsWith('/')||p.startsWith('//')||p.startsWith('/api')||STATIC_RE.test(p))return;
+  p=p.replace(/\.html$/,'').replace(/\/index$/,'/')||'/';
+  let ref=null;try{const h=new URL(String((req.body||{}).referrer||'')).hostname.toLowerCase().replace(/^www\./,'');if(h&&h!==String(req.hostname||'').toLowerCase().replace(/^www\./,''))ref=h.slice(0,100)}catch{}
+  const day=new Date().toISOString().slice(0,10);
+  const vh=require('crypto').createHash('sha256').update([req.ip,ua,day,process.env.SESSION_SECRET||'dev-secret-change-me'].join('|')).digest('hex').slice(0,32);
+  db.run('INSERT INTO visits(day,path,ref_host,visitor_hash) VALUES(?,?,?,?)',[day,p,ref,vh])}catch(e){console.error('track:',e.message)}});
+app.get('/api/admin/visits',need('admin'),(req,res)=>{const d=n=>new Date(Date.now()-n*864e5).toISOString().slice(0,10);
+  const tot=from=>db.get(`SELECT COUNT(*) views,COUNT(DISTINCT day||visitor_hash) visitors FROM visits WHERE day>=?`,[from]);
+  const series=db.all(`SELECT day,COUNT(*) views,COUNT(DISTINCT visitor_hash) visitors FROM visits WHERE day>=? GROUP BY day`,[d(29)]);const m=Object.fromEntries(series.map(r=>[r.day,r]));
+  res.json({totals:{today:tot(d(0)),d7:tot(d(6)),d30:tot(d(29)),all:tot('0000')},
+    daily:Array.from({length:30},(_,i)=>{const k=d(29-i);return m[k]||{day:k,views:0,visitors:0}}),
+    top_pages:db.all(`SELECT path,COUNT(*) views,COUNT(DISTINCT day||visitor_hash) visitors FROM visits WHERE day>=? GROUP BY path ORDER BY views DESC LIMIT 15`,[d(29)]),
+    top_referrers:db.all(`SELECT ref_host,COUNT(*) views FROM visits WHERE day>=? AND ref_host IS NOT NULL GROUP BY ref_host ORDER BY views DESC LIMIT 15`,[d(29)])})});
+
 // ---- admin
 app.get('/api/admin/payouts',need('admin'),(req,res)=>res.json(payout.compute(req.query.month)));
 app.get('/api/admin/settings',need('admin'),(req,res)=>res.json(db.settings()));

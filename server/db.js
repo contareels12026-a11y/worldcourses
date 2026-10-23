@@ -30,6 +30,9 @@ async function init(){
   exec(`CREATE TABLE IF NOT EXISTS site_feedback(id INTEGER PRIMARY KEY,user_id INTEGER NOT NULL,course_id INTEGER,rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),comment TEXT,improve TEXT,lang TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
     CREATE TABLE IF NOT EXISTS feedback_state(user_id INTEGER PRIMARY KEY,status TEXT NOT NULL,later_course_id INTEGER,updated_at TEXT DEFAULT CURRENT_TIMESTAMP);`);
   exec(`CREATE TABLE IF NOT EXISTS ideas(id INTEGER PRIMARY KEY,user_id INTEGER,want TEXT,topic TEXT,category TEXT,would_create TEXT,email TEXT,message TEXT,lang TEXT,ip_hash TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP)`);
+  // contador de visitas anónimo (sem cookies): só hash diário do visitante, nunca o IP
+  exec(`CREATE TABLE IF NOT EXISTS visits(id INTEGER PRIMARY KEY,day TEXT NOT NULL,path TEXT NOT NULL,ref_host TEXT,visitor_hash TEXT NOT NULL,country TEXT,created_at TEXT DEFAULT CURRENT_TIMESTAMP);
+    CREATE INDEX IF NOT EXISTS visits_day ON visits(day);`);
   backfillLanguages();
   for(const[k,v]of Object.entries(DEFAULTS))run('INSERT OR IGNORE INTO settings(key,value) VALUES(?,?)',[k,v]);
   exec('CREATE TABLE IF NOT EXISTS sessions(sid TEXT PRIMARY KEY,sess TEXT NOT NULL,expires INTEGER NOT NULL)');
