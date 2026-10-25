@@ -178,7 +178,7 @@ app.get('/api/admin/feedback.csv',need('admin'),(req,res)=>{const q=v=>'"'+Strin
   res.set('Content-Disposition','attachment; filename="site_feedback.csv"').type('text/csv').send('\ufeff'+['created_at,name,email,rating,comment,improve,course_id,lang',...rows.map(r=>[r.created_at,r.name,r.email,r.rating,r.comment,r.improve,r.course_id,r.lang].map(q).join(','))].join('\r\n'))});
 
 // ---- ideias/opinião pública (/opiniao): sem login; honeypot, limites de tamanho e rate limit por IP/sessão
-const IDEA_CATS=['tech','ai','biz','design','diy','fitness','food','health','home','influencer','mech','travel','other'];
+const IDEA_CATS=['tech','ai','biz','design','diy','fitness','food','health','home','influencer','mech','photo','travel','other'];
 const ideaHits=new Map();const ipHash=ip=>require('crypto').createHash('sha256').update(String(ip)+(process.env.SESSION_SECRET||'wc')).digest('hex').slice(0,16);
 function ideaLimited(key){const now=Date.now(),arr=(ideaHits.get(key)||[]).filter(x=>now-x<3600e3);if(arr.length>=5){ideaHits.set(key,arr);return true}arr.push(now);ideaHits.set(key,arr);return false}
 setInterval(()=>{const now=Date.now();for(const[k,a]of ideaHits)if(!a.some(x=>now-x<3600e3))ideaHits.delete(k)},600e3).unref();

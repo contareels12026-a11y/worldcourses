@@ -1,11 +1,11 @@
 <!DOCTYPE html><html lang="pt" data-theme="dark"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=16"><link rel="stylesheet" href="/platform.css?v=16">
-<script src="/i18n.js?v=16"></script><script src="/app.js?v=16"></script><title>Painel de Criador — The World Courses</title></head><body data-page="creator">
+<link rel="stylesheet" href="/styles.css?v=17"><link rel="stylesheet" href="/platform.css?v=17">
+<script src="/i18n.js?v=17"></script><script src="/app.js?v=17"></script><title>Painel de Criador — The World Courses</title></head><body data-page="creator">
 <div id="chrome-top"></div>
 <main class="wrap page" id="dash"></main><div id="chrome-foot"></div>
 <script>
-const CATS=['tech','mech','biz','ai','design','health','food','diy','travel','fitness','influencer'];
+const CATS=['tech','mech','biz','ai','design','health','food','diy','travel','fitness','influencer','photo'];
 async function load(month){const m=document.getElementById('dash');
  if(!ME||!['creator','admin'].includes(ME.role)){m.innerHTML=`<p class="err">${t('not_allowed')}</p><a class="btn gold" href="/login.html?next=/creator.html">${t('login')}</a>`;return}
  const s=await api('/api/creator/stats?lang='+LANG+(month?'&month='+month:'')),cs=await api('/api/creator/courses?lang='+LANG),k=s.mine;
